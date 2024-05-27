@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "luxgiant-clinical"
+version = "0.1.0"
+description = ""
+authors = ["luisggon <luisggon@flyde.io>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.2"
+scikit-learn = "^1.5.0"
+scipy = "^1.13.1"
+matplotlib = "^3.9.0"
+seaborn = "^0.13.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
