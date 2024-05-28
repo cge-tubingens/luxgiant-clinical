@@ -170,3 +170,32 @@ class HandYstage(BaseEstimator, TransformerMixin):
 
         if x_num <= 3: return 'Not severe'
         else: return 'Severe'
+
+class ExposurePesticide(TransformerMixin, BaseEstimator):
+
+    def __init__(self, output_col) -> None:
+        super().__init__()
+        self.output_col = output_col
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy= X.copy()
+        cols  = X_copy.columns
+
+        output_col = self.output_col
+
+        X_copy[output_col] = 'No'
+
+        X_copy.loc[
+            (X_copy[cols[0]] == 1) | (X_copy[cols[1]] == 1) | 
+            (X_copy[cols[2]] == 1) | (X_copy[cols[3]] == 1), output_col
+        ] = 'Yes'
+
+        return X_copy
+
