@@ -256,4 +256,41 @@ class ComputingRatio(TransformerMixin, BaseEstimator):
 
         X_copy[output_col] = X_copy[cols[0]]/X_copy[cols[1]]
 
-        return X_copy
+        return X_copy[output_col]
+
+class Categorizer(TransformerMixin, BaseEstimator):
+
+    def __init__(self, cutoffs:list, labels:dict, output_col:str, include_right:bool=True)->None:
+        super().__init__()
+        self.cutoffs   = cutoffs
+        self.labels    = labels
+        self.output_col= output_col
+        self.include_right     = include_right
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy= X.copy()
+        col   = X_copy.columns[0]
+
+        output_col= self.output_col
+        cutoffs   = self.cutoffs
+        labels    = self.labels
+        right = self.include_right
+
+        bins = [-float('inf')] + cutoffs + [float('inf')]
+        bins_labels = list(labels.keys())
+        bins_labels.sort()
+
+        X_copy[output_col] = pd.cut(X_copy[col], bins=bins, labels=bins_labels, right=right)
+
+        X_copy[output_col] = X_copy[output_col].astype(float)
+
+        X_copy[output_col] = X_copy[output_col].map(labels)
+
+        return X_copy[output_col]
