@@ -64,3 +64,59 @@ class InitialMotorSymptoms(TransformerMixin, BaseEstimator):
         X_copy.loc[(X_copy[cols[0]] == 'Unchecked') | (X_copy[cols[1]] == 'Unchecked'), output_col] = 'Unchecked' 
 
         return X_copy
+
+class HandYOnOff(TransformerMixin, BaseEstimator):
+
+    def __init__(self, output_col:str='hyonoff') -> None:
+        super().__init__()
+        self.output_col = output_col
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy = X.copy()
+        cols = X_copy.columns
+        output_col = self.output_col
+
+        X_copy[output_col] = None
+
+        X_copy.loc[X_copy[cols[0]] == 1, output_col] = 'On'
+        X_copy.loc[X_copy[cols[0]] == 2, output_col] = 'Off'
+
+        X_copy.loc[X_copy[cols[1]] == 1, output_col] = 'On'
+        X_copy.loc[X_copy[cols[1]] == 2, output_col] = 'Off'
+
+        return X_copy
+
+class PDduration(BaseEstimator, TransformerMixin):
+
+    def __init__(self, output_col:str='pdsl', cutoff:int=5)->None:
+        super().__init__()
+        self.output_col = output_col
+        self.cutoff     = cutoff
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy = X.copy()
+        col    = X_copy.columns[0]
+
+        output_col= self.output_col
+        cutoff    = self.cutoff
+
+        X_copy[output_col] = None
+
+        X_copy.loc[X_copy[col] <=cutoff, output_col] = f"<={cutoff}"
+        X_copy.loc[X_copy[col] >cutoff, output_col] = f">{cutoff}"
+
+        return X_copy
