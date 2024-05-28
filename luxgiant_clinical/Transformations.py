@@ -221,7 +221,7 @@ class ComputingAverages(TransformerMixin, BaseEstimator):
         X_copy[output_col] = 0
 
         for col in cols:
-            temp = X_copy[col].apply(lambda x: self.encoder(x))
+            temp = X_copy[col].apply(lambda x: self.encoder(x)).astype(float)
 
             X_copy[output_col] += temp
 
