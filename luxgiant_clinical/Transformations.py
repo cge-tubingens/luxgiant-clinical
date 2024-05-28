@@ -3,6 +3,23 @@ from sklearn.base import TransformerMixin, BaseEstimator
 import pandas as pd
 import numpy as np
 
+class Identity(BaseEstimator, TransformerMixin):
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy= X.copy()
+
+        return X_copy
+
 class AgeCategory(BaseEstimator, TransformerMixin):
 
     def __init__(self, age_cutoff:int, output_col:str) -> None:
@@ -120,3 +137,36 @@ class PDduration(BaseEstimator, TransformerMixin):
         X_copy.loc[X_copy[col] >cutoff, output_col] = f">{cutoff}"
 
         return X_copy
+
+class HandYstage(BaseEstimator, TransformerMixin):
+
+    def __init__(self, output_col:str='hystage')->None:
+        super().__init__()
+        self.output_col = output_col
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy = X.copy()
+        col    = X_copy.columns[0]
+
+        output_col= self.output_col
+
+        X_copy[output_col] = X_copy[col].apply(lambda x: self.stage_encoder(x))
+
+        return X_copy
+    
+    @staticmethod
+    def stage_encoder(x:str)->str:
+
+        if x is None: return None
+
+        x_num = float(x.split(' - ')[0])
+
+        if x_num <= 3: return 'Not severe'
+        else: return 'Severe'
