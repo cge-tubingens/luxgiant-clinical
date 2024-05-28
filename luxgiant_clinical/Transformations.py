@@ -199,3 +199,40 @@ class ExposurePesticide(TransformerMixin, BaseEstimator):
 
         return X_copy
 
+class ComputingAverages(TransformerMixin, BaseEstimator):
+
+    def __init__(self, output_col:str=None) -> None:
+        super().__init__()
+        self.output_col = output_col
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy = X.copy()
+        cols = X_copy.columns
+
+        output_col = self.output_col
+
+        X_copy[output_col] = 0
+
+        for col in cols:
+            temp = X_copy[col].apply(lambda x: self.encoder(x))
+
+            X_copy[output_col] += temp
+
+        X_copy[output_col] = X_copy[output_col]/len(cols)
+
+        return X_copy
+    
+    @staticmethod
+    def encoder(x:str)->float:
+
+        if x is None: return np.nan
+        else: return float(x.split(' - ')[0])
+
+        
