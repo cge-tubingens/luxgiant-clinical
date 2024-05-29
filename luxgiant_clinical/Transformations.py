@@ -288,3 +288,52 @@ class RecodeGeoZone(TransformerMixin, BaseEstimator):
 
         if x == 'Southern Zone': return 'Southern Zone'
         else: return 'Other Zone'
+
+class CleanDatscan(BaseEstimator, TransformerMixin):
+
+    def __init__(self, datscan_col:str, med_col:str) -> None:
+        super().__init__()
+        self.datscan_col = datscan_col
+        self.med_col = med_col
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy= X.copy()
+        datscan_col = self.datscan_col
+        med_col = self.med_col
+
+        X_copy.loc[X_copy[med_col] == 'Yes', datscan_col] = 'Yes'
+
+
+        return X_copy
+    
+class CleanPramipexole(BaseEstimator, TransformerMixin):
+
+    def __init__(self, pramipex_col:str, ropinerole_col:str) -> None:
+        super().__init__()
+        self.pramipex_col  = pramipex_col
+        self.ropinerole_col= ropinerole_col
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy= X.copy()
+        pramipex_col  = self.pramipex_col
+        ropinerole_col= self.ropinerole_col
+
+        X_copy.loc[X_copy[ropinerole_col] == 'Yes', pramipex_col] = 'Yes'
+
+
+        return X_copy
+
