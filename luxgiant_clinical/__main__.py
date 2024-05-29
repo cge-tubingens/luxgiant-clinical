@@ -83,3 +83,5 @@ def execute_main()->None:
     df_clean = final_cleaning(df)
 
     del df
+
+    df_clean.to_csv(os.path.join(output_folder, 'cleaned_file.csv'), index=False)
