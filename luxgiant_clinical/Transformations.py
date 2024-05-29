@@ -257,3 +257,34 @@ class Categorizer(TransformerMixin, BaseEstimator):
         X_copy[output_col] = X_copy[output_col].map(labels)
 
         return X_copy[output_col]
+
+class RecodeGeoZone(TransformerMixin, BaseEstimator):
+
+    def __init__(self, output_col) -> None:
+        super().__init__()
+        self.output_col = output_col
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy= X.copy()
+        col = X_copy.columns
+
+        output_col = self.output_col
+
+        X_copy[output_col] = X_copy[col[0]].apply(lambda x: self.reencoder(x))
+
+        return X_copy
+    
+    @staticmethod
+    def reencoder(x:str)->str:
+
+        if x is None: return None
+
+        if x == 'Southern Zone': return 'Southern Zone'
+        else: return 'Other Zone'
