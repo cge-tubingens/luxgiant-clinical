@@ -8,6 +8,7 @@ from sklearn.compose import ColumnTransformer
 
 from luxgiant_clinical.ClinicalReport import contingency_table
 from luxgiant_clinical.Transformations import InitialMotorSymptoms, HandYOnOff, HandYstage, ExposurePesticide, ComputingAverages, ComputingRatio, Categorizer, RecodeGeoZone
+from luxgiant_clinical.Transformations import CleanDatscan, CleanPramipexole
 from luxgiant_clinical.Helpers import recover_columns_names
 
 # DATA_MANAS= '/mnt/0A2AAC152AABFBB7/data/LuxGiantMatched/AGESEXMATCHED_GAPINDIA_DATA_23.01.2024.dta'
@@ -35,7 +36,9 @@ adv_trns = ColumnTransformer([
     ('expopest', ExposurePesticide(output_col='exppesticide').set_output(transform='pandas'),[ 'nature_of_work___1', 'nature_of_work___2', 'over_your_lifetime_have_yo', 'during_your_lifetime_did_y'] ),
     ('num', ComputingAverages(output_col='num').set_output(transform='pandas'), ['tremor_7', 'tremor_at_rest_head_upper', 'tremor_at_rest_head_upper_4', 'tremor_at_rest_head_upper_2','tremor_at_rest_head_upper_3', 'tremor_at_rest_head_upper_5', 'action_or_postural_tremor', 'action_or_postural_tremor_2']),
     ('dem', ComputingAverages(output_col='dem').set_output(transform='pandas'), ['falling', 'freezing_when_walking', 'walking', 'gait', 'postural_stability_respons']),
-    ('recodegeo', RecodeGeoZone(output_col='zonecat').set_output(transform='pandas'), ['zone_of_origin'])
+    ('recodegeo', RecodeGeoZone(output_col='zonecat').set_output(transform='pandas'), ['zone_of_origin']),
+    ('fix_datscan', CleanDatscan(datscan_col='datscan', med_col='f_dopa_pet').set_output(transform='pandas'), ['datscan', 'f_dopa_pet']),
+    ('pramipexole', CleanPramipexole(pramipex_col='pramipexole', ropinerole_col='ropinerole'), ['pramipexole', 'ropinerole'])
 ],
 remainder='passthrough').set_output(transform='pandas')
 
