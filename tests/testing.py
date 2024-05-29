@@ -7,7 +7,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 
 from luxgiant_clinical.ClinicalReport import contingency_table
-from luxgiant_clinical.Transformations import InitialMotorSymptoms, HandYOnOff, HandYstage, ExposurePesticide, ComputingAverages, ComputingRatio, Categorizer
+from luxgiant_clinical.Transformations import InitialMotorSymptoms, HandYOnOff, HandYstage, ExposurePesticide, ComputingAverages, ComputingRatio, Categorizer, RecodeGeoZone
 from luxgiant_clinical.Helpers import recover_columns_names
 
 # DATA_MANAS= '/mnt/0A2AAC152AABFBB7/data/LuxGiantMatched/AGESEXMATCHED_GAPINDIA_DATA_23.01.2024.dta'
@@ -21,16 +21,21 @@ df_luis  = stata_luis.read(preserve_dtypes=False, convert_categoricals=True, con
 
 age1_labels = {0: "<50", 1:">=50"}
 age2_labels = {0: "<40", 1:">=40"}
+age3_labels = {0:"<21", 1: "21-49", 2:"50-60", 3:">60"}
+age4_labels = {1:"<=30", 2: "31-40", 3:"41-50", 4:"51-60", 5:"61-70", 6:"71-80", 7:">80"}
 
 adv_trns = ColumnTransformer([
     ('age_pipe1', Categorizer(cutoffs=[50], labels=age1_labels, output_col='agecat_1', include_right=False), ['age_at_onset']),
-    ('age_pipe2', Categorizer(cutoffs=[40], labels=age1_labels, output_col='agecat_2', include_right=False), ['age_at_onset']),
+    ('age_pipe2', Categorizer(cutoffs=[40], labels=age2_labels, output_col='agecat_2', include_right=False), ['age_at_onset']),
+    ('age_pipe3', Categorizer(cutoffs=[21, 50, 60], labels=age3_labels, output_col='agecatmd', include_right=False), ['age_at_onset']),
+    ('age_pipe4', Categorizer(cutoffs=[30, 40, 50, 60, 70, 80], labels=age4_labels, output_col='agecent', include_right=True), ['age_at_onset']),
     ('initmotor_pipe', InitialMotorSymptoms(output_col='inmotnonmot').set_output(transform='pandas'), ['initial_symptom_s___1', 'initial_symptom_s___2']),
     ('handyonoff', HandYOnOff(output_col='hyonoff').set_output(transform='pandas'), ['on_off', 'b_if_the_patient_is_receiv']),
     ('handystages', HandYstage(output_col='hystage').set_output(transform='pandas'), ['hoehn_and_yahr_staging']),
     ('expopest', ExposurePesticide(output_col='exppesticide').set_output(transform='pandas'),[ 'nature_of_work___1', 'nature_of_work___2', 'over_your_lifetime_have_yo', 'during_your_lifetime_did_y'] ),
     ('num', ComputingAverages(output_col='num').set_output(transform='pandas'), ['tremor_7', 'tremor_at_rest_head_upper', 'tremor_at_rest_head_upper_4', 'tremor_at_rest_head_upper_2','tremor_at_rest_head_upper_3', 'tremor_at_rest_head_upper_5', 'action_or_postural_tremor', 'action_or_postural_tremor_2']),
-    ('dem', ComputingAverages(output_col='dem').set_output(transform='pandas'), ['falling', 'freezing_when_walking', 'walking', 'gait', 'postural_stability_respons'])
+    ('dem', ComputingAverages(output_col='dem').set_output(transform='pandas'), ['falling', 'freezing_when_walking', 'walking', 'gait', 'postural_stability_respons']),
+    ('recodegeo', RecodeGeoZone(output_col='zonecat').set_output(transform='pandas'), ['zone_of_origin'])
 ],
 remainder='passthrough').set_output(transform='pandas')
 
