@@ -13,17 +13,20 @@ from Helpers import arg_parser
 
 def final_cleaning(df_data:pd.DataFrame)->pd.DataFrame:
 
-    from luxgiant_clinical.Transformations import InitialMotorSymptoms, HandYOnOff, HandYstage, ExposurePesticide, ComputingAverages, ComputingRatio, Categorizer, RecodeGeoZone
-    from luxgiant_clinical.Transformations import CleanDatscan, CleanPramipexole
-    from luxgiant_clinical.Helpers import recover_columns_names
+    from Transformations import InitialMotorSymptoms, HandYOnOff, HandYstage, ExposurePesticide, ComputingAverages, ComputingRatio, Categorizer, RecodeGeoZone
+    from Transformations import CleanDatscan, CleanPramipexole, Identity
+    from Helpers import recover_columns_names
 
     age1_labels = {0: "<50", 1:">=50"}
     age2_labels = {0: "<40", 1:">=40"}
     age3_labels = {0:"<21", 1: "21-49", 2:"50-60", 3:">60"}
     age4_labels = {1:"<=30", 2: "31-40", 3:"41-50", 4:"51-60", 5:"61-70", 6:"71-80", 7:">80"}
     edu_labels  = {1:"<=12", 2:"Above 12"}
+    pdsl_labels = {0:"<=5", 1:">5"}
 
     adv_trns = ColumnTransformer([
+        ('identity', Identity().set_output(transform='pandas'), ['age_at_onset', 'years_of_education', 'PD_duration']),
+        ('pd_dur', Categorizer(cutoffs=[5], labels=pdsl_labels, output_col='pdsl', include_right=False), ['PD_duration']),
         ('age_pipe1', Categorizer(cutoffs=[50], labels=age1_labels, output_col='agecat_1', include_right=False), ['age_at_onset']),
         ('age_pipe2', Categorizer(cutoffs=[40], labels=age2_labels, output_col='agecat_2', include_right=False), ['age_at_onset']),
         ('age_pipe3', Categorizer(cutoffs=[21, 50, 60], labels=age3_labels, output_col='agecatmd', include_right=False), ['age_at_onset']),
@@ -85,3 +88,6 @@ def execute_main()->None:
     del df
 
     df_clean.to_csv(os.path.join(output_folder, 'cleaned_file.csv'), index=False)
+
+if __name__=="__main__":
+    execute_main()
