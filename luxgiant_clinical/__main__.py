@@ -14,7 +14,7 @@ from Helpers import arg_parser
 def final_cleaning(df_data:pd.DataFrame)->pd.DataFrame:
 
     from Transformations import InitialMotorSymptoms, HandYOnOff, HandYstage, ExposurePesticide, ComputingAverages, ComputingRatio, Categorizer, RecodeGeoZone
-    from Transformations import CleanDatscan, CleanPramipexole, Identity
+    from Transformations import CleanDatscan, CleanPramipexole, Identity, HandYcorrector
     from Helpers import recover_columns_names
 
     age1_labels = {0: "<50", 1:">=50"}
@@ -55,7 +55,8 @@ def final_cleaning(df_data:pd.DataFrame)->pd.DataFrame:
     ])
     
     scnd_trns = ColumnTransformer([
-        ('ratio_pipe', ratio_pipe, ['num', 'dem'])
+        ('ratio_pipe', ratio_pipe, ['num', 'dem']),
+        ('handystage', HandYcorrector(ref_col='hyonoff').set_output(transform='pandas'), ['hyonoff', 'hoehn_and_yahr_staging'])
     ],
     remainder='passthrough').set_output(transform='pandas')
     
