@@ -110,4 +110,12 @@ def chi_squared_conditioned(df_data:pd.DataFrame, conditionants:dict, group_var:
 
     return df_res
 
+def fisher_exact_test(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
+    crosstab_results = {}
+    for var in variables:
+        crosstab = pd.crosstab(df_data[var], df_data[group_var])
+        fisher, p= stats.fisher_exact(crosstab)
+        crosstab_results[var] = {'fisher': fisher, 'p_val': p}
+
+    return pd.DataFrame(crosstab_results)
