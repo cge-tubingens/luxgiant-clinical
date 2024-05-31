@@ -337,3 +337,27 @@ class CleanPramipexole(BaseEstimator, TransformerMixin):
 
         return X_copy
 
+class HandYcorrector(BaseEstimator, TransformerMixin):
+
+    def __init__(self, ref_col:str='hyonoff') -> None:
+        super().__init__()
+        self.ref_col = ref_col
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy = X.copy()
+        cols = X_copy.columns
+
+        ref_col = self.ref_col
+
+        X_copy.loc[X_copy[ref_col] == 'Off', cols[1]] =\
+            X_copy.loc[X_copy[ref_col] == 'Off', cols[1]]\
+                .replace('0 - No signs of disease', '1 - Unilateral disease ')
+        
+        return X_copy
