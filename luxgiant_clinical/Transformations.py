@@ -66,7 +66,7 @@ class HandYOnOff(TransformerMixin, BaseEstimator):
         X_copy[output_col] = None
 
         X_copy['col_0'] = X_copy[cols[0]].apply(lambda x: x.split(':')[0] if x is not None else None)
-        X_copy['col_1'] = X_copy[cols[0]].apply(lambda x: x.split(':')[0] if x is not None else None)
+        X_copy['col_1'] = X_copy[cols[1]].apply(lambda x: x.split(':')[0] if x is not None else None)
 
         X_copy.loc[X_copy['col_0'] == 'ON', output_col] = 'On'
         X_copy.loc[X_copy['col_0'] == 'OFF', output_col] = 'Off'
