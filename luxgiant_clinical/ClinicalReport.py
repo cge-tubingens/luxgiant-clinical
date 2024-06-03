@@ -49,6 +49,25 @@ def descriptive_analytics_by_group(df_data:pd.DataFrame, variables:list, group_v
 
     return df_grouped.transpose()
 
+def conditioned_descriptive_analytics_by_group(df_data:pd.DataFrame, variables:list, group_var:str, condition:tuple)->pd.DataFrame:
+    
+    def first_Q(x:pd.DataFrame)->float: 
+        return np.nanquantile(x, 0.25)
+    def median(x:pd.DataFrame)->float: 
+        return np.nanquantile(x, 0.5)
+    def third_Q(x:pd.DataFrame)->float: 
+        return np.nanquantile(x, 0.75)
+    
+    df_filtered = df_data[df_data[condition[0]]==condition[1]].reset_index(drop=True)
+    
+    all_vars = variables + [group_var]
+
+    df_grouped = df_filtered[all_vars].groupby(by=group_var).agg(
+       ['mean', 'std', 'min', 'max', first_Q, median, third_Q]
+    )
+
+    return df_grouped.transpose()
+
 def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
     ttest_results = {}
@@ -70,6 +89,21 @@ def mann_whitney_by_groups(df_data:pd.DataFrame, variables:list, group_var:str)-
     for var in variables:
         group1 = df_data[df_data[group_var] == groups[0]][var]
         group2 = df_data[df_data[group_var] == groups[1]][var]
+        u_stat, p_val = stats.mannwhitneyu(group1.dropna(), group2.dropna())
+        mw_results[var] = {'u_stat': u_stat, 'p_val': p_val}
+
+    return pd.DataFrame(mw_results)
+
+def conditioned_mann_whitney_by_groups(df_data:pd.DataFrame, variables:list, group_var:str, condition:tuple)->pd.DataFrame:
+
+    mw_results = {}
+    groups = df_data[group_var].unique().tolist()
+
+    df_filtered = df_data[df_data[condition[0]]==condition[1]].reset_index(drop=True)
+
+    for var in variables:
+        group1 = df_filtered[df_filtered[group_var] == groups[0]][var]
+        group2 = df_filtered[df_filtered[group_var] == groups[1]][var]
         u_stat, p_val = stats.mannwhitneyu(group1.dropna(), group2.dropna())
         mw_results[var] = {'u_stat': u_stat, 'p_val': p_val}
 
