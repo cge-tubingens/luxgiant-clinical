@@ -74,7 +74,7 @@ class HandYOnOff(TransformerMixin, BaseEstimator):
         X_copy.loc[X_copy['col_1'] == 'ON', output_col] = 'On'
         X_copy.loc[X_copy['col_1'] == 'OFF', output_col] = 'Off'
 
-        return X_copy
+        return X_copy[cols.tolist() + [output_col]]
 
 class PDduration(BaseEstimator, TransformerMixin):
 
