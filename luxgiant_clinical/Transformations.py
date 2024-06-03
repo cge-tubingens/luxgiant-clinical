@@ -361,16 +361,19 @@ class HandYcorrector(BaseEstimator, TransformerMixin):
         ref_col = self.ref_col
         status_col = self.status_col
 
-        X_copy[cols[2]] = X_copy.apply(
-            lambda row: self.encoder(row[ref_col], row[cols[2]], row[status_col]), axis=1
+        mask_patients = (X_copy[status_col] == 'Patient')
+
+        reference = X_copy[ref_col].apply(
+            lambda x: True if x is not None and x=='Off' else False
+        ).astype(bool)
+
+        target = X_copy[cols[2]].apply(
+            lambda x: True if x is not None and x=='0 - No signs of disease' else False
         )
+        target = target.fillna(False).astype(bool)
+
+        mask = (mask_patients & reference & target)
+
+        X_copy.loc[mask, cols[2]] = '1 - Unilateral disease'
         
         return X_copy
-    
-    @staticmethod
-    def encoder(reference:str, target:str, status)->str:
-
-        if status == 'Control' or reference is None or target is None: return target
-
-        if target == '0 - No signs of disease' and reference == 'Off':
-            return '1 - Unilateral disease'
