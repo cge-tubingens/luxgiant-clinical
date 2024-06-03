@@ -86,7 +86,7 @@ def chi_squared_tests(df_data:pd.DataFrame, variables:list, group_var:str)->pd.D
 
     return pd.DataFrame(crosstab_results)
 
-def chi_squared_conditioned(df_data:pd.DataFrame, conditionants:dict, group_var:str)->pd.DataFrame:
+def chi_squared_conditioned(df_data:pd.DataFrame, conditionants:dict, condition:str, group_var:str)->pd.DataFrame:
 
     df_res = pd.DataFrame(columns=['Condition', 'Variable', 'chi2', 'p_val', 'dof'])
 
@@ -94,19 +94,23 @@ def chi_squared_conditioned(df_data:pd.DataFrame, conditionants:dict, group_var:
 
     for key in conditionants.keys():
 
-        mask = (df_data[key]=='Yes')
+        var_list = conditionants[key]
 
-        df_cond = df_data[mask].reset_index(drop=True)
+        for var in var_list:
 
-        temp = chi_squared_tests(df_data=df_cond, variables=[conditionants[key]], group_var=group_var)
+            mask = (df_data[key]==condition)
 
-        df_res.loc[count, 'Condition']= key
-        df_res.loc[count, 'Variable'] = conditionants[key]
-        df_res.loc[count, 'chi2']     = temp.loc['chi2', conditionants[key]]
-        df_res.loc[count, 'p_val']    = temp.loc['p_val', conditionants[key]]
-        df_res.loc[count, 'dof']      = temp.loc['dof', conditionants[key]]
+            df_cond = df_data[mask].reset_index(drop=True)
 
-        count+=1
+            temp = chi_squared_tests(df_data=df_cond, variables=[var], group_var=group_var)
+
+            df_res.loc[count, 'Condition']= key
+            df_res.loc[count, 'Variable'] = var
+            df_res.loc[count, 'chi2']     = temp.loc['chi2', var]
+            df_res.loc[count, 'p_val']    = temp.loc['p_val', var]
+            df_res.loc[count, 'dof']      = temp.loc['dof', var]
+
+            count+=1
 
     return df_res
 
