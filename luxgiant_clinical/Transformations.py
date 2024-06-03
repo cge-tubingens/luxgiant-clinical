@@ -339,9 +339,10 @@ class CleanPramipexole(BaseEstimator, TransformerMixin):
 
 class HandYcorrector(BaseEstimator, TransformerMixin):
 
-    def __init__(self, ref_col:str='hyonoff') -> None:
+    def __init__(self, status_col:str, ref_col:str='hyonoff') -> None:
         super().__init__()
         self.ref_col = ref_col
+        self.status_col = status_col
 
     def get_feature_names_out(self):
         pass
@@ -355,9 +356,18 @@ class HandYcorrector(BaseEstimator, TransformerMixin):
         cols = X_copy.columns
 
         ref_col = self.ref_col
+        status_col = self.status_col
 
-        X_copy.loc[X_copy[ref_col] == 'Off', cols[1]] =\
-            X_copy.loc[X_copy[ref_col] == 'Off', cols[1]]\
-                .replace('0 - No signs of disease', '1 - Unilateral disease ')
+        X_copy[cols[2]] = X_copy.apply(
+            lambda row: self.encoder(row[ref_col], row[cols[2]], row[status_col]), axis=1
+        )
         
         return X_copy
+    
+    @staticmethod
+    def encoder(reference:str, target:str, status)->str:
+
+        if status == 'Control' or reference is None or target is None: return target
+
+        if target == '0 - No signs of disease' and reference == 'Off':
+            return '1 - Unilateral disease'
