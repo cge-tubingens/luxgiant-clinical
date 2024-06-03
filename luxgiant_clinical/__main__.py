@@ -56,7 +56,7 @@ def final_cleaning(df_data:pd.DataFrame)->pd.DataFrame:
     
     scnd_trns = ColumnTransformer([
         ('ratio_pipe', ratio_pipe, ['num', 'dem']),
-        ('handystage', HandYcorrector(ref_col='hyonoff').set_output(transform='pandas'), ['hyonoff', 'hoehn_and_yahr_staging'])
+        ('handystage', HandYcorrector(ref_col='hyonoff', status_col='Status').set_output(transform='pandas'), ['hyonoff', 'Status', 'hoehn_and_yahr_staging'])
     ],
     remainder='passthrough').set_output(transform='pandas')
     
