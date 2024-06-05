@@ -15,10 +15,10 @@ def contingency_table(X:pd.DataFrame, index_col:str, columns:str, outputPath:str
 
     return contingency
 
-def descriptive_analytics(df_data:pd.DataFrame)->pd.DataFrame:
+def descriptive_analytics(df_data:pd.DataFrame, variables:list)->pd.DataFrame:
 
     frequency_stats = {}
-    for var in df_data.columns:
+    for var in variables:
         desc = df_data[var].describe()
         frequency_stats[var] = {
             'mean'  : np.round(desc['mean'], 3),
@@ -70,12 +70,14 @@ def conditioned_descriptive_analytics_by_group(df_data:pd.DataFrame, variables:l
 
 def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
+    df_data_new = df_data[~df_data[group_var].isnull()].reset_index(drop=True)
+
     ttest_results = {}
-    groups = df_data[group_var].unique().tolist()
+    groups = df_data_new[group_var].unique().tolist()
     
     for var in variables:
-        group1 = df_data[df_data[group_var] == groups[0]][var]
-        group2 = df_data[df_data[group_var] == groups[1]][var]
+        group1 = df_data_new[df_data_new[group_var] == groups[0]][var]
+        group2 = df_data_new[df_data_new[group_var] == groups[1]][var]
         t_stat, p_val = stats.ttest_ind(group1.dropna(), group2.dropna())
         ttest_results[var] = {'t_stat': t_stat, 'p_val': p_val}
 
@@ -84,11 +86,13 @@ def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.Dat
 def mann_whitney_by_groups(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
     mw_results = {}
-    groups = df_data[group_var].unique().tolist()
+
+    df_data_new = df_data[~df_data[group_var].isnull()].reset_index(drop=True)
+    groups = df_data_new[group_var].unique().tolist()
 
     for var in variables:
-        group1 = df_data[df_data[group_var] == groups[0]][var]
-        group2 = df_data[df_data[group_var] == groups[1]][var]
+        group1 = df_data_new[df_data_new[group_var] == groups[0]][var]
+        group2 = df_data_new[df_data_new[group_var] == groups[1]][var]
         u_stat, p_val = stats.mannwhitneyu(group1.dropna(), group2.dropna())
         mw_results[var] = {'u_stat': u_stat, 'p_val': p_val}
 
@@ -97,9 +101,10 @@ def mann_whitney_by_groups(df_data:pd.DataFrame, variables:list, group_var:str)-
 def conditioned_mann_whitney_by_groups(df_data:pd.DataFrame, variables:list, group_var:str, condition:tuple)->pd.DataFrame:
 
     mw_results = {}
-    groups = df_data[group_var].unique().tolist()
+    df_data_new = df_data[~df_data[group_var].isnull()].reset_index(drop=True)
+    groups = df_data_new[group_var].unique().tolist()
 
-    df_filtered = df_data[df_data[condition[0]]==condition[1]].reset_index(drop=True)
+    df_filtered = df_data_new[df_data_new[condition[0]]==condition[1]].reset_index(drop=True)
 
     for var in variables:
         group1 = df_filtered[df_filtered[group_var] == groups[0]][var]
