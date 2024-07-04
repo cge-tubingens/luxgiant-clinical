@@ -48,7 +48,7 @@ def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.Dat
         
         group1 = df_data[df_data[group_var] == groups[0]][var]
         group2 = df_data[df_data[group_var] == groups[1]][var]
-        
+
         t_stat, p_val = stats.ttest_ind(group1.dropna(), group2.dropna())
         ttest_results[var] = {'t_stat': t_stat, 'p_value': p_val}
 
@@ -64,9 +64,35 @@ def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.Dat
 
 def mean_std_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
 
+    """
+    Calculate the mean and standard deviation for a list of features in a DataFrame.
+
+    Parameters:
+    -----------
+    data (pd.DataFrame): 
+        The input DataFrame containing the data.
+    features (list): 
+        A list of column names (strings) in data for which the mean and standard deviation will be calculated.
+
+    Returns:
+    --------
+    pd.DataFrame: 
+        A DataFrame with the calculated mean and standard deviation for each feature. The DataFrame has 
+        columns 'Variable' and 'Total'. 'Variable' contains the names of the features, and 'Total' contains 
+        the mean and standard deviation formatted as "mean (std)".
+
+    Raises:
+    -------
+    KeyError: If any of the features in the features list are not present in data.
+
+    """
+
     result = pd.DataFrame(index=features, columns=['Total'])
 
     for feat in features:
+
+        if feat not in data.columns:
+            raise KeyError(f"The specified feature '{feat}' is not in the DataFrame.")
 
         mean= round(np.mean(data[feat]),1)
         std = round(np.std(data[feat]), 1)
