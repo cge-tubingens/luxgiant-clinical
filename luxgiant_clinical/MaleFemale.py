@@ -34,8 +34,8 @@ def mean_std_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
 
     for feat in features:
 
-        mean= round(np.mean(data[feat]),2)
-        std = round(np.std(data[feat]), 2)
+        mean= round(np.mean(data[feat]),1)
+        std = round(np.std(data[feat]), 1)
 
         result.loc[feat, 'Total'] = f"{mean} ({std})"
 
@@ -77,8 +77,8 @@ def summaryze_mean_std(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:l
 
         df_sum.loc[num_rows+k,'Variable'] = col
         df_sum.loc[num_rows+k,'Statistical Measure'] = 'mean (SD)'
-        df_sum.loc[num_rows+k,group_1] = f"{round(mean[group_1][0],2)} ({round(std[group_1][0],2)})"
-        df_sum.loc[num_rows+k,group_2] = f"{round(mean[group_2][0],2)} ({round(std[group_2][0],2)})"
+        df_sum.loc[num_rows+k,group_1] = f"{round(mean[group_1][0],1)} ({round(std[group_1][0],1)})"
+        df_sum.loc[num_rows+k,group_2] = f"{round(mean[group_2][0],1)} ({round(std[group_2][0],1)})"
         df_sum.loc[num_rows+k,'Available Sample for Analysis'] = f"{count[group_1][0]+count[group_2][0]}"
 
     return df_sum
@@ -142,7 +142,7 @@ def count_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
     for feat in features:
 
         count = int(np.nansum(data[feat]))
-        percent = round(100*(count/data.shape[0]),2)
+        percent = round(100*(count/data.shape[0]),1)
 
         result.loc[feat, 'Total'] = f"{count} ({percent})"
 
@@ -169,8 +169,8 @@ def summaryze_count_percent(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variab
 
         df_sum.loc[num_rows+k,'Variable'] = col
         df_sum.loc[num_rows+k,'Statistical Measure'] = 'n (%)'
-        df_sum.loc[num_rows+k,group_1] = f"{round(sum[group_1][0])} ({round(perc[group_1][0],2)})"
-        df_sum.loc[num_rows+k,group_2] = f"{round(sum[group_2][0])} ({round(perc[group_2][0],2)})"
+        df_sum.loc[num_rows+k,group_1] = f"{round(sum[group_1][0])} ({round(perc[group_1][0],1)})"
+        df_sum.loc[num_rows+k,group_2] = f"{round(sum[group_2][0])} ({round(perc[group_2][0],1)})"
         df_sum.loc[num_rows+k,'Available Sample for Analysis'] = f"{count[group_1][0]+count[group_2][0]}"
 
     return df_sum
@@ -181,9 +181,9 @@ def median_iqr_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
 
     for feat in features:
 
-        first = round(np.nanquantile(data[feat], 0.25),2)
-        median = round(np.nanquantile(data[feat], 0.5),2)
-        third = round(np.nanquantile(data[feat], 0.75),2)
+        first = round(np.nanquantile(data[feat], 0.25),1)
+        median = round(np.nanquantile(data[feat], 0.5),1)
+        third = round(np.nanquantile(data[feat], 0.75),1)
 
         result.loc[feat, 'Total'] = f"{median} ({first} - {third})"
 
@@ -256,8 +256,8 @@ def summaryze_median_iqr(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables
 
         df_sum.loc[num_rows+k,'Variable'] = col
         df_sum.loc[num_rows+k,'Statistical Measure'] = 'median (IQR)'
-        df_sum.loc[num_rows+k,group_1] = f"{round(medn[group_1][0],2)} ({round(fstq[group_1][0],2)} - {round(trdq[group_1][0],2)})"
-        df_sum.loc[num_rows+k,group_2] = f"{round(medn[group_2][0],2)} ({round(fstq[group_2][0],2)} - {round(trdq[group_2][0],2)})"
+        df_sum.loc[num_rows+k,group_1] = f"{round(medn[group_1][0],1)} ({round(fstq[group_1][0],1)} - {round(trdq[group_1][0],1)})"
+        df_sum.loc[num_rows+k,group_2] = f"{round(medn[group_2][0],1)} ({round(fstq[group_2][0],1)} - {round(trdq[group_2][0],1)})"
         df_sum.loc[num_rows+k,'Available Sample for Analysis'] = f"{count[group_1][0]+count[group_2][0]}"
 
     return df_sum
@@ -280,15 +280,15 @@ def count_categories(data:pd.DataFrame, grouping_by:str, variable:str, new_var_n
     result['Total'] = result[groups[0]] + result[groups[1]]
 
     result[groups[0]] = result[groups[0]].apply(
-        lambda x: f"{x} ({round(100*x/df_0.shape[0], 2)})"
+        lambda x: f"{x} ({round(100*x/df_0.shape[0], 1)})"
     )
 
     result[groups[1]] = result[groups[1]].apply(
-        lambda x: f"{x} ({round(100*x/df_1.shape[0], 2)})"
+        lambda x: f"{x} ({round(100*x/df_1.shape[0], 1)})"
     )
 
     result['Total'] = result['Total'].apply(
-        lambda x: f"{x} ({round(100*x/df_1.shape[0], 2)})"
+        lambda x: f"{x} ({round(100*x/df_1.shape[0], 1)})"
     )
 
     if new_var_name is not None:
