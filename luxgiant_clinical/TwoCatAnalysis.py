@@ -9,12 +9,46 @@ from scipy import stats
 
 def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
+    """
+    Perform independent t-tests for a list of variables between two groups in a DataFrame.
+
+    Parameters:
+    -----------
+    df_data (pd.DataFrame): 
+        The input DataFrame containing the data.
+    variables (list): 
+        A list of column names (strings) in df_data for which the t-tests will be performed.
+    group_var (str): 
+        The name of the column in df_data that contains the group labels. The column should have exactly two unique values.
+
+    Returns:
+    -------
+    pd.DataFrame: 
+        A DataFrame with the results of the t-tests. The DataFrame has columns 'Variable' and 'p-value'. 
+        'Variable' contains the names of the variables tested, and 'p-value' contains the p-values of the t-tests. 
+        P-values are rounded to 4 decimal places, with p-values less than 0.001 reported as "p<0.001".
+
+    Raises:
+    -------
+    ValueError: If the group_var column does not contain exactly two unique values.
+    KeyError: If any of the variables in the variables list or the group_var are not present in df_data.
+    """
+
     ttest_results = {}
     groups = df_data[group_var].unique().tolist()
+
+    if len(groups) != 2:
+        raise ValueError("The group_var column must contain exactly two unique values.")
+
     
     for var in variables:
+
+        if var not in df_data.columns or group_var not in df_data.columns:
+            raise KeyError("The specified variable or group_var is not in the DataFrame.")
+        
         group1 = df_data[df_data[group_var] == groups[0]][var]
         group2 = df_data[df_data[group_var] == groups[1]][var]
+        
         t_stat, p_val = stats.ttest_ind(group1.dropna(), group2.dropna())
         ttest_results[var] = {'t_stat': t_stat, 'p_value': p_val}
 
