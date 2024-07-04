@@ -1,5 +1,5 @@
 """
-Module with function tailored to 
+Module with functions tailored to get summary statistics with grouped data with two categories
 """
 
 import numpy as np
