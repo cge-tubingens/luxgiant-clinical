@@ -84,7 +84,6 @@ def mean_std_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
     Raises:
     -------
     KeyError: If any of the features in the features list are not present in data.
-
     """
 
     result = pd.DataFrame(index=features, columns=['Total'])
