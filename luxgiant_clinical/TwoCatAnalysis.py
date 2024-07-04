@@ -106,6 +106,37 @@ def mean_std_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
 
 def mean_std(data:pd.DataFrame, features:list, grouping_by:str)->pd.DataFrame:
 
+    """
+    Calculate the mean, standard deviation, and count for a list of features in a DataFrame, 
+    grouped by a specified column.
+
+    Parameters:
+    ----------
+    data (pd.DataFrame): 
+        The input DataFrame containing the data.
+    features (list): 
+        A list of column names (strings) in data for which the mean, standard deviation, 
+        and count will be calculated.
+    grouping_by (str): 
+        The name of the column in data by which to group the data.
+
+    Returns:
+    --------
+    pd.DataFrame: 
+        A DataFrame with the calculated mean, standard deviation, and count for each feature, 
+        grouped by the specified column. The DataFrame has columns 'Variable', 'Stat', and one 
+        column for each unique value in the grouping_by column.
+
+    Raises:
+    ------
+    KeyError: If any of the features in the features list or the grouping_by column are not present in data.
+
+    """
+
+    for feat in features:
+        if feat not in data.columns:
+            raise KeyError(f"The specified feature '{feat}' is not in the DataFrame.")
+
     agg_dict = {feat: ['mean', 'std', 'count'] for feat in features}
 
     grouped = data.groupby(by=grouping_by, as_index=False)[features]\
