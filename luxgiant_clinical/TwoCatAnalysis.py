@@ -232,7 +232,8 @@ def count_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
     for feat in features:
 
         count = int(np.nansum(data[feat]))
-        percent = round(100*(count/data.shape[0]),1)
+        non_null = (~data[feat].isnull()).sum()
+        percent = round(100*(count/non_null),1)
 
         result.loc[feat, 'Total'] = f"{count} ({percent})"
 
