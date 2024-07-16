@@ -1,3 +1,7 @@
+"""
+Module with transformers to process cleaned data from LuxGiant consortia
+"""
+
 from sklearn.base import TransformerMixin, BaseEstimator
 
 import pandas as pd
@@ -5,16 +9,71 @@ import numpy as np
 
 class Identity(BaseEstimator, TransformerMixin):
 
+    """
+    A scikit-learn transformer that performs an identity transformation.
+
+    This transformer returns the input data unchanged. It can be used as a
+    placeholder or in a pipeline where no transformation is required.
+    """
+
     def __init__(self) -> None:
+        """
+        Initializes the Identity transformer.
+
+        Parameters
+        ----------
+        None
+        """
         super().__init__()
 
     def get_feature_names_out(self):
+        """
+        Get output feature names for transformation.
+
+        Returns
+        -------
+        None
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn
+        transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : Identity
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        """
+        Transform the input data by returning a copy of it.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            A copy of the input data.
+        """
 
         X_copy= X.copy()
 
