@@ -165,17 +165,73 @@ class InitialMotorSymptoms(TransformerMixin, BaseEstimator):
 
 class HandYOnOff(TransformerMixin, BaseEstimator):
 
+    """
+    A scikit-learn transformer to identify 'ON' or 'OFF' states from the first two columns of a DataFrame.
+
+    This transformer adds a new column to the input DataFrame, indicating 'On' or 'Off' based on the
+    values of the first two columns, which are expected to contain strings with 'ON' or 'OFF' states.
+    """
+
     def __init__(self, output_col:str='hyonoff') -> None:
+        """
+        Initialize the HandYOnOff transformer.
+
+        Parameters
+        ----------
+        output_col : str, optional (default='hyonoff')
+            The name of the output column to be added to the DataFrame.
+        """
         super().__init__()
         self.output_col = output_col
 
     def get_feature_names_out(self):
+        """
+        Get output feature names for transformation.
+
+        Returns
+        -------
+        None
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn
+        transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : HandYOnOff
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        """
+        Transform the input data by adding a new column based on the 'ON' or 'OFF' states in the first two columns.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            The transformed DataFrame with the new column added.
+        """
 
         X_copy = X.copy()
         cols = X_copy.columns
