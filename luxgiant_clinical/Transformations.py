@@ -525,17 +525,74 @@ class ExposurePesticide(TransformerMixin, BaseEstimator):
 
 class ComputingAverages(TransformerMixin, BaseEstimator):
 
+    """
+    A scikit-learn transformer to compute the average of numerical values from columns.
+
+    This transformer adds a new column to the input DataFrame, which contains the average
+    of numerical values extracted from the existing columns.
+    """
+
     def __init__(self, output_col:str=None) -> None:
+        """
+        Initialize the ComputingAverages transformer.
+
+        Parameters
+        ----------
+        output_col : str, optional
+            The name of the output column to be added to the DataFrame. If not provided,
+            the output column will default to None.
+        """
         super().__init__()
         self.output_col = output_col
 
     def get_feature_names_out(self):
+        """
+        Get output feature names for transformation.
+
+        Returns
+        -------
+        None
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn
+        transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : ComputingAverages
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        """
+        Transform the input data by adding a new column containing the average of numerical values.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            The transformed DataFrame with the new column added.
+        """
 
         X_copy = X.copy()
         cols = X_copy.columns
@@ -555,6 +612,21 @@ class ComputingAverages(TransformerMixin, BaseEstimator):
     
     @staticmethod
     def encoder(x:str)->float:
+
+        """
+        Encode the numerical value from the input string.
+
+        Parameters
+        ----------
+        x : str
+            The input string containing a numerical value.
+
+        Returns
+        -------
+        float
+            The numerical value extracted from the input string. If the input is None,
+            returns NaN.
+        """
 
         if x is None: return np.nan
         else: return float(x.split(' - ')[0])
