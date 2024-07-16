@@ -400,3 +400,45 @@ class HandYcorrector(BaseEstimator, TransformerMixin):
         X_copy.loc[mask, cols[2]] = '1 - Unilateral disease'
         
         return X_copy
+
+class AgeCategory(BaseEstimator, TransformerMixin):
+
+    def __init__(self, status_col:str, onset_col:str, age_col:str) -> None:
+        super().__init__()
+        self.status_col = status_col
+        self.age_col = age_col
+        self.onset_col = onset_col
+
+    def get_feature_names_out(self):
+        pass
+
+    def fit(self, X:pd.DataFrame, y=None):
+        return self
+    
+    def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        X_copy = X.copy()
+        col = X_copy.columns[0]
+
+        status_col= self.status_col
+        age_col   = self.age_col
+        onset_col = self.onset_col
+
+        mask_control = (X_copy[status_col]=='Control')
+
+        X_copy.loc[mask_control, onset_col] = X_copy.loc[mask_control, age_col].copy()
+
+        mask_group0 = (X_copy[onset_col]<21)
+
+        mask_group1 = ((X_copy[onset_col]>=21) & (X_copy[onset_col]<50))
+
+        mask_group2 = ((X_copy[onset_col]>=50)&(X_copy[onset_col]<=60))
+
+        mask_group3 = (X_copy[onset_col]>60)
+
+        X_copy.loc[mask_group0, 'age_category'] = "Onset <21 years"
+        X_copy.loc[mask_group1, 'age_category'] = "Onset 21-49 years"
+        X_copy.loc[mask_group2, 'age_category'] = "Onset 50-60 years"
+        X_copy.loc[mask_group3, 'age_category'] = "Onset >60 years"
+
+        return X_copy
