@@ -338,17 +338,73 @@ class PDduration(BaseEstimator, TransformerMixin):
 
 class HandYstage(BaseEstimator, TransformerMixin):
 
+    """
+    A scikit-learn transformer to encode severity stages based on the input column.
+
+    This transformer adds a new column to the input DataFrame, encoding the severity
+    based on the values of the first column, which are expected to be strings
+    containing a numeric value.
+    """
+
     def __init__(self, output_col:str='hystage')->None:
+        """
+        Initialize the HandYstage transformer.
+
+        Parameters
+        ----------
+        output_col : str, optional (default='hystage')
+            The name of the output column to be added to the DataFrame.
+        """
         super().__init__()
         self.output_col = output_col
 
     def get_feature_names_out(self):
+        """
+        Get output feature names for transformation.
+
+        Returns
+        -------
+        None
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn
+        transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : HandYstage
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+        """
+        Transform the input data by adding a new column based on the encoded severity stages.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            The transformed DataFrame with the new column added.
+        """
 
         X_copy = X.copy()
         col    = X_copy.columns[0]
@@ -361,6 +417,20 @@ class HandYstage(BaseEstimator, TransformerMixin):
     
     @staticmethod
     def stage_encoder(x:str)->str:
+        """
+        Encode the severity stage based on the input string.
+
+        Parameters
+        ----------
+        x : str
+            The input string containing a numeric value.
+
+        Returns
+        -------
+        str
+            'Not severe' if the numeric value is less than or equal to 3,
+            'Severe' otherwise.
+        """
 
         if x is None: return None
 
