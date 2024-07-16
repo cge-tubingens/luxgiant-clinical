@@ -937,18 +937,79 @@ class RecodeGeoZone(TransformerMixin, BaseEstimator):
 
 class CleanDatscan(BaseEstimator, TransformerMixin):
 
+    """
+    A scikit-learn transformer to clean DATScan data based on medication status.
+
+    This transformer modifies a DATScan column based on medication status,
+    setting it to 'Yes' if medication is taken.
+    """
+
     def __init__(self, datscan_col:str, med_col:str) -> None:
+        """
+        Initialize the CleanDatscan transformer.
+
+        Parameters
+        ----------
+        datscan_col : str
+            The name of the DATScan column to be modified.
+        med_col : str
+            The name of the medication column used for cleaning.
+        """
         super().__init__()
         self.datscan_col = datscan_col
         self.med_col = med_col
 
     def get_feature_names_out(self):
+        """
+        Initialize the CleanDatscan transformer.
+
+        Parameters
+        ----------
+        datscan_col : str
+            The name of the DATScan column to be modified.
+        med_col : str
+            The name of the medication column used for cleaning.
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn
+        transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : CleanDatscan
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        """
+        Transform the input data by cleaning the DATScan column based on medication status.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            The transformed DataFrame with the DATScan column modified based on medication status.
+        """
 
         X_copy= X.copy()
         datscan_col = self.datscan_col
