@@ -201,11 +201,13 @@ class ComputingAverages(TransformerMixin, BaseEstimator):
         if x is None: return np.nan
         else: return float(x.split(' - ')[0])
 
-class ComputingRatio(TransformerMixin, BaseEstimator):
+class Subtype(TransformerMixin, BaseEstimator):
 
-    def __init__(self, output_col) -> None:
+    def __init__(self, output_col:str, num_col:str, den_col:str) -> None:
         super().__init__()
-        self.output_col = output_col
+        self.output_col= output_col
+        self.num_col   = num_col
+        self.den_col   = den_col
 
     def get_feature_names_out(self):
         pass
@@ -216,11 +218,32 @@ class ComputingRatio(TransformerMixin, BaseEstimator):
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
 
         X_copy = X.copy()
-        cols = X_copy.columns
 
         output_col = self.output_col
+        num_col =self.num_col
+        den_col =self.den_col
 
-        X_copy[output_col] = X_copy[cols[0]]/X_copy[cols[1]]
+        X_copy['ratio'] = X_copy[num_col]/X_copy[den_col]
+
+        mask_ratio_p    = (X_copy['ratio'] > 0)
+        mask_rat_less_1 = (X_copy['ratio'] <= 1)
+        mask_rat_grt_1  = (X_copy['ratio'] > 1)
+        mask_rat_less_15= (X_copy['ratio'] < 1.5)
+        mask_rat_grt_15 = (X_copy['ratio'] >= 1.5)
+
+        X_copy.loc[mask_ratio_p & mask_rat_less_1, output_col]   = "Postural instability and gait difficulty"
+        X_copy.loc[mask_rat_grt_1 & mask_rat_less_15, output_col]= "Indeterminate"
+        X_copy.loc[mask_rat_grt_15, output_col]                  = "Tremor Dominant"
+
+        mask_num_0 = (X_copy[num_col]==0)
+        mask_num_p = (X_copy[num_col]>0)
+
+        mask_den_0 = (X_copy[den_col]==0)
+        mask_den_p = (X_copy[den_col]>0)
+
+        X_copy.loc[mask_num_p & mask_den_0, output_col] = "Tremor Dominant"
+        X_copy.loc[mask_num_0 & mask_den_p, output_col] = "Postural instability and gait difficulty"
+        X_copy.loc[mask_num_0 & mask_den_0, output_col] = "Indeterminate"
 
         return X_copy[output_col]
 
