@@ -739,20 +739,82 @@ class Subtype(TransformerMixin, BaseEstimator):
 
 class Categorizer(TransformerMixin, BaseEstimator):
 
+    """
+    A scikit-learn transformer to categorize continuous values into discrete categories.
+
+    This transformer adds a new column to the input DataFrame, which contains categories
+    based on the specified cutoffs and labels.
+    """
+
     def __init__(self, cutoffs:list, labels:dict, output_col:str, include_right:bool=True)->None:
+        """
+        Initialize the Categorizer transformer.
+
+        Parameters
+        ----------
+        cutoffs : list
+            A list of cutoff points to define the bins.
+        labels : dict
+            A dictionary mapping bin numbers to category labels.
+        output_col : str
+            The name of the output column to be added to the DataFrame.
+        include_right : bool, optional (default=True)
+            Whether the bins should include the rightmost edge.
+        """
         super().__init__()
-        self.cutoffs   = cutoffs
-        self.labels    = labels
-        self.output_col= output_col
-        self.include_right     = include_right
+        self.cutoffs      = cutoffs
+        self.labels       = labels
+        self.output_col   = output_col
+        self.include_right= include_right
 
     def get_feature_names_out(self):
+        """
+        Get output feature names for transformation.
+
+        Returns
+        -------
+        None
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn
+        transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : Categorizer
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        """
+        Transform the input data by adding a new column with categorized values.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            The transformed DataFrame with the new column added.
+        """
 
         X_copy= X.copy()
         col   = X_copy.columns[0]
@@ -760,7 +822,7 @@ class Categorizer(TransformerMixin, BaseEstimator):
         output_col= self.output_col
         cutoffs   = self.cutoffs
         labels    = self.labels
-        right = self.include_right
+        right     = self.include_right
 
         bins = [-float('inf')] + cutoffs + [float('inf')]
         bins_labels = list(labels.keys())
@@ -776,17 +838,72 @@ class Categorizer(TransformerMixin, BaseEstimator):
 
 class RecodeGeoZone(TransformerMixin, BaseEstimator):
 
+    """
+    A scikit-learn transformer to recode geographical zones.
+
+    This transformer adds a new column to the input DataFrame, which recodes the geographical
+    zone values based on predefined rules.
+    """
+
     def __init__(self, output_col) -> None:
+        """
+        Initialize the RecodeGeoZone transformer.
+
+        Parameters
+        ----------
+        output_col : str
+            The name of the output column to be added to the DataFrame.
+        """
         super().__init__()
         self.output_col = output_col
 
     def get_feature_names_out(self):
+        """
+        Get output feature names for transformation.
+
+        Returns
+        -------
+        None
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn
+        transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : RecodeGeoZone
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+        """
+        Transform the input data by adding a new column with recoded geographical zones.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            The transformed DataFrame with the new column added.
+        """
 
         X_copy= X.copy()
         col = X_copy.columns
@@ -799,6 +916,19 @@ class RecodeGeoZone(TransformerMixin, BaseEstimator):
     
     @staticmethod
     def reencoder(x:str)->str:
+        """
+        Recode the geographical zone value.
+
+        Parameters
+        ----------
+        x : str
+            The input geographical zone value.
+
+        Returns
+        -------
+        str
+            'Southern Zone' if the input is 'Southern Zone', 'Other Zone' otherwise.
+        """
 
         if x is None: return None
 
