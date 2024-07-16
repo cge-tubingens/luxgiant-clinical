@@ -441,17 +441,73 @@ class HandYstage(BaseEstimator, TransformerMixin):
 
 class ExposurePesticide(TransformerMixin, BaseEstimator):
 
+    """
+    A scikit-learn transformer to identify exposure to pesticides.
+
+    This transformer adds a new column to the input DataFrame, indicating 'Yes' if
+    any of the first four columns contain a 1, otherwise 'No'.
+    """
+
     def __init__(self, output_col) -> None:
+        """
+        Initialize the ExposurePesticide transformer.
+
+        Parameters
+        ----------
+        output_col : str
+            The name of the output column to be added to the DataFrame.
+        """
         super().__init__()
         self.output_col = output_col
 
     def get_feature_names_out(self):
+        """
+        Get output feature names for transformation.
+
+        Returns
+        -------
+        None
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn
+        transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : ExposurePesticide
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+
+        """
+        Transform the input data by adding a new column indicating pesticide exposure.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            The transformed DataFrame with the new column added.
+        """
 
         X_copy= X.copy()
         cols  = X_copy.columns
