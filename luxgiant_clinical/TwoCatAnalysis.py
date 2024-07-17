@@ -770,7 +770,6 @@ def report_mean_std(data_df:pd.DataFrame, variables:list, groups:list, grouping_
     - Assumes the existence of helper functions `mean_std`, `summaryze_mean_std`,
       `mean_std_simple`, and `t_test_by_group`.
     - Assumes `data_df` contains columns specified in `variables`, `groups`, and `grouping_by`.
-
     """
 
     # create empty dataframe to store results
@@ -801,6 +800,40 @@ def report_mean_std(data_df:pd.DataFrame, variables:list, groups:list, grouping_
     return df_summary[ordered_cols].copy()
 
 def report_median_iqr(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str)->pd.DataFrame:
+
+    """
+    Generate a summary report with median, interquartile range (IQR), sample sizes, and Mann-Whitney U test results
+    for specified variables across different groups.
+
+    This function computes descriptive statistics (median, IQR) and performs Mann-Whitney U tests between groups for
+    each specified variable (`variables`) based on the grouping variable (`grouping_by`). It then combines these
+    results into a summary DataFrame (`df_summary`) for easy comparison.
+
+    Parameters
+    ----------
+    data_df : pd.DataFrame
+        The DataFrame containing the data to analyze.
+    variables : list
+        A list of column names (variables) in `data_df` for which statistics are computed.
+    groups : list
+        A list of column names in `data_df` representing the groups to compare.
+    grouping_by : str
+        The column name in `data_df` used to group the data for comparison.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame (`df_summary`) summarizing median, IQR, p-values from Mann-Whitney U tests, and sample sizes
+        for each variable (`variables`) across different groups.
+        Columns include 'Variable' (the variable names), 'Statistical Measure' (type of statistic: 'median (IQR)'),
+        values for each group defined in `groups`, 'Total' (total counts or sums of variables), 'p-value' (p-values
+        from Mann-Whitney U tests), and 'Available Samples for Analysis' (total count of samples available for analysis).
+
+    Notes
+    -----
+    - Assumes the existence of helper functions `median_iqr`, `summaryze_median_iqr`, `median_iqr_simple`, and `mann_whitney`.
+    - Assumes `data_df` contains columns specified in `variables`, `groups`, and `grouping_by`.
+    """
 
     # create empty dataframe to store results
     summary_cols = ['Variable', 'Statistical Measure'] + groups + ['Available Samples for Analysis']
