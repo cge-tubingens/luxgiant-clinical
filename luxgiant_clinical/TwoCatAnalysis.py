@@ -308,6 +308,80 @@ def count_percent(data:pd.DataFrame, features:list, grouping_by:str)->pd.DataFra
 
     return result
 
+def decide_fisher_chi2(feature_1:pd.Series, feature_2:pd.Series)->bool:
+
+    """
+    Decide between Fisher's Exact Test and Chi-square Test based on expected frequencies.
+
+    This function computes the expected frequencies using a contingency table (crosstab)
+    created from `feature_1` and `feature_2`. It checks if any expected frequency is less 
+    than 5, indicating a potential issue with using the Chi-square Test. If more than 20% 
+    of the expected frequencies are below 5, Fisher's Exact Test is recommended.
+
+    Parameters
+    ----------
+    feature_1 : pd.Series
+        The first categorical feature for comparison.
+    feature_2 : pd.Series
+        The second categorical feature for comparison.
+
+    Returns
+    -------
+    bool
+        True if Fisher's Exact Test is recommended (more than 20% expected frequencies < 5),
+        False if Chi-square Test can be used.
+    """
+
+    df_cross = pd.crosstab(feature_1, feature_2, margins=True)
+
+    counter = []
+
+    for k in range(len(df_cross)-1):
+        for m in range(len(df_cross)-1):
+            expected = (df_cross.iloc[-1,m]*df_cross.iloc[k,-1])/df_cross.iloc[-1,-1]
+            if expected <5:
+                counter.append(1)
+            else:
+                counter.append(0)
+
+    percent = sum(counter)/len(counter)
+    if percent>0.2: return True # requires Fisher's Exact Test
+    else: return False          # chi2 test can be used
+
+def chi2_fisher_exact(feature_1:pd.Series, feature_2:pd.Series)->float:
+
+    """
+    Perform chi-square test or Fisher's exact test based on expected frequencies.
+
+    This function computes a contingency table (crosstab) from `feature_1` and `feature_2` 
+    and determines whether to use Fisher's exact test or chi-square test based on the 
+    expected frequencies in the contingency table.
+
+    Parameters
+    ----------
+    feature_1 : pd.Series
+        The first categorical feature for comparison.
+    feature_2 : pd.Series
+        The second categorical feature for comparison.
+
+    Returns
+    -------
+    float
+        The p-value resulting from either the chi-square test or Fisher's exact test.
+
+    Notes
+    -----
+    If the expected frequencies in any cell of the contingency table are less than 5, 
+    Fisher's exact test is used. Otherwise, the chi-square test is used.
+    """
+
+    crosstab = pd.crosstab(feature_1, feature_2)
+
+    if decide_fisher_chi2(feature_1, feature_2):
+        return stats.fisher_exact(crosstab).pvalue
+    else:
+        return stats.chi2_contingency(crosstab, correction=False).pvalue
+
 def chi_squared_tests(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
     crosstab_results = {}
