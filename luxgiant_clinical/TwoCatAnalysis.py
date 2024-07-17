@@ -384,6 +384,32 @@ def chi2_fisher_exact(feature_1:pd.Series, feature_2:pd.Series)->float:
 
 def chi_squared_tests(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
+    """
+    Perform chi-square or Fisher's exact tests for multiple variables against a grouping variable.
+
+    This function computes p-values for each variable in `variables` against `group_var` using either
+    chi-square tests or Fisher's exact tests based on expected frequencies in contingency tables.
+
+    Parameters
+    ----------
+    df_data : pd.DataFrame
+        The pandas DataFrame containing the data.
+    variables : list
+        A list of column names (variables) in `df_data` to test against `group_var`.
+    group_var : str
+        The column name in `df_data` representing the grouping variable.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing the variables and their corresponding p-values from the tests.
+
+    Notes
+    -----
+    This function internally calls `chi2_fisher_exact` for each variable to determine the appropriate
+    statistical test based on expected frequencies in contingency tables.
+    """
+
     crosstab_results = {}
     for var in variables:
 
