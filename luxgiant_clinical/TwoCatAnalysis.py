@@ -558,7 +558,7 @@ def median_iqr_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
     for feat in features:
 
         first = round(np.nanquantile(data[feat], 0.25),1)
-        median = round(np.nanquantile(data[feat], 0.5),1)
+        median= round(np.nanquantile(data[feat], 0.5),1)
         third = round(np.nanquantile(data[feat], 0.75),1)
 
         result.loc[feat, 'Total'] = f"{median} ({first} - {third})"
