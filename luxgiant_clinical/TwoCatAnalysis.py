@@ -619,6 +619,36 @@ def mann_whitney(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFr
 
 def median_iqr(data:pd.DataFrame, features:list, grouping_by:str)->pd.DataFrame:
 
+    """
+    Calculate median and interquartile range (IQR) for specified features grouped by `grouping_by`.
+
+    This function computes the first quartile (Q1), median, third quartile (Q3), and count
+    for each feature in `features` grouped by the categorical variable `grouping_by` in the DataFrame `data`.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The DataFrame containing the data to be analyzed.
+    features : list
+        A list of column names (features) in `data` for which median and IQR are computed.
+    grouping_by : str
+        The name of the column in `data` that defines the grouping variable.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame summarizing the median, first quartile (Q1), third quartile (Q3), and count
+        for each feature grouped by `grouping_by`. Columns include 'Variable' (the feature names),
+        'Stat' (the statistical measure: 'first_Q', 'median', 'third_Q', 'count'), and the values
+        corresponding to each group defined by `grouping_by`.
+
+    Notes
+    -----
+    - NaN values are automatically handled by np.nanquantile function.
+    - Assumes `data` contains numeric data or data that can be processed by np.nanquantile.
+
+    """
+
     def first_Q(x:pd.DataFrame)->float: 
         return np.nanquantile(x, 0.25)
     def median(x:pd.DataFrame)->float: 
