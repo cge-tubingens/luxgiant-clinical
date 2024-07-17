@@ -19,7 +19,6 @@ def final_cleaning(df_data:pd.DataFrame)->pd.DataFrame:
 
     age1_labels = {0: "<50", 1:">=50"}
     age2_labels = {0: "<40", 1:">=40"}
-    age3_labels = {0:"<21", 1: "21-49", 2:"50-60", 3:">60"}
     age4_labels = {1:"<=30", 2: "31-40", 3:"41-50", 4:"51-60", 5:"61-70", 6:"71-80", 7:">80"}
     edu_labels  = {1:"<=12", 2:"Above 12"}
     pdsl_labels = {0:"<=5", 1:">5"}
