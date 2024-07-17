@@ -122,6 +122,34 @@ def one_way_anova(df_data:pd.DataFrame, variables:list, grouping:str)->pd.DataFr
 
 def summaryze_count_percent(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, groups:list)->pd.DataFrame:
 
+    """
+    Summarizes count and percentage statistics from a grouped DataFrame (`df_grouped`) into a summary DataFrame (`df_sum`).
+
+    Parameters
+    ----------
+    df_sum : pd.DataFrame
+        The DataFrame to store the summarized statistics.
+    df_grouped : pd.DataFrame
+        The grouped DataFrame containing statistics to be summarized.
+        Must have columns 'Variable', 'Stat', and columns corresponding to groups in `groups`.
+    variables : list
+        List of variables (column names) to summarize from `df_grouped`.
+    groups : list
+        List of group names (column names) in `df_grouped` where statistics are summarized across.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame (`df_sum`) containing summarized count and percentage statistics for each variable across groups.
+        Columns include 'Variable', 'Statistical Measure', group names from `groups`, and 'Available Samples for Analysis'.
+
+    Notes
+    -----
+    - Assumes `df_grouped` has columns 'Variable', 'Stat', and columns corresponding to `groups`.
+    - Updates `df_sum` with new rows for each variable in `variables`, summarizing count and percentage statistics across `groups`.
+
+    """
+    
     num_rows = df_sum.shape[0]
 
     group_1 = groups[0]
