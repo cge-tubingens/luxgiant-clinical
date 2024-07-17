@@ -75,6 +75,33 @@ def summaryze_mean_std(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:l
 
 def one_way_anova(df_data:pd.DataFrame, variables:list, grouping:str)->pd.DataFrame:
 
+    """
+    Perform one-way ANOVA (Analysis of Variance) for each variable (`variables`) in the DataFrame (`df_data`)
+    across the groups defined by `grouping`.
+
+    Parameters
+    ----------
+    df_data : pd.DataFrame
+        The input DataFrame containing the data.
+    variables : list
+        List of column names (variables) for which ANOVA will be performed.
+    grouping : str
+        The column name representing the grouping variable.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing the results of one-way ANOVA for each variable.
+        Columns include 'Variable' (variable name) and 'p-value' (rounded to 4 decimal places).
+
+    Notes
+    -----
+    - Drops rows with NaN values in the specified variables before performing ANOVA.
+    - Uses scipy.stats.f_oneway to compute ANOVA statistics.
+    - Assumes `df_data` contains columns specified in `variables` and `grouping`.
+
+    """
+
     results = []
     
     # Get unique groups
@@ -92,7 +119,6 @@ def one_way_anova(df_data:pd.DataFrame, variables:list, grouping:str)->pd.DataFr
     results_df = pd.DataFrame(results)
 
     return results_df
-
 
 def summaryze_count_percent(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, groups:list)->pd.DataFrame:
 
