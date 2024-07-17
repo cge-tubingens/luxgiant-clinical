@@ -864,6 +864,42 @@ def report_median_iqr(data_df:pd.DataFrame, variables:list, groups:list, groupin
 
 def report_proportion(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str, subheader:str=None)->pd.DataFrame:
 
+    """
+    Generate a summary report with proportions, counts, p-values from chi-squared tests,
+    and sample sizes for specified variables across different groups.
+
+    This function computes proportions (as percentages), counts, and performs chi-squared tests
+    between groups for each specified variable (`variables`) based on the grouping variable (`grouping_by`).
+    It then combines these results into a summary DataFrame (`df_summary`) for easy comparison.
+
+    Parameters
+    ----------
+    data_df : pd.DataFrame
+        The DataFrame containing the data to analyze.
+    variables : list
+        A list of column names (variables) in `data_df` for which statistics are computed.
+    groups : list
+        A list of column names in `data_df` representing the groups to compare.
+    grouping_by : str
+        The column name in `data_df` used to group the data for comparison.
+    subheader : str, optional
+        Optional subheader to prepend to the summary DataFrame (`df_summary`). Default is None.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame (`df_summary`) summarizing proportions, counts, p-values from chi-squared tests,
+        and sample sizes for each variable (`variables`) across different groups.
+        Columns include 'Variable' (the variable names), 'Statistical Measure' (type of statistic: 'n (%)'),
+        values for each group defined in `groups`, 'Total' (total counts or sums of variables), 'p-value' (p-values
+        from chi-squared tests), and 'Available Samples for Analysis' (total count of samples available for analysis).
+
+    Notes
+    -----
+    - Assumes the existence of helper functions `count_percent`, `summaryze_count_percent`, `count_simple`, and `chi_squared_tests`.
+    - Assumes `data_df` contains columns specified in `variables`, `groups`, and `grouping_by`.
+    """    
+    
     # create empty dataframe to store results
     summary_cols = ['Variable', 'Statistical Measure'] + groups + ['Available Samples for Analysis']
     df_summary = pd.DataFrame(columns=summary_cols)
