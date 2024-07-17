@@ -13,6 +13,40 @@ import luxgiant_clinical.TwoCatAnalysis as two
 
 def summaryze_mean_std(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, groups:list)->pd.DataFrame:
 
+    """
+    Summarize mean and standard deviation (SD) statistics from a grouped DataFrame (`df_grouped`)
+    into a summary DataFrame (`df_sum`).
+
+    This function computes and populates the `df_sum` DataFrame with the mean and SD values
+    for each variable (`variables`) across specified groups (`groups`). It assumes that `df_grouped`
+    contains pre-aggregated statistics for each variable across groups.
+
+    Parameters
+    ----------
+    df_sum : pd.DataFrame
+        The summary DataFrame where the results will be populated.
+    df_grouped : pd.DataFrame
+        The grouped DataFrame containing statistical measures (mean, std, count) for each variable.
+        Must have columns 'Variable', 'Stat' (containing 'mean', 'std', 'count'), and columns for each group.
+    variables : list
+        List of variables (column names) for which mean and SD are summarized.
+    groups : list
+        List of column names representing the groups for which statistics are summarized.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame (`df_sum`) with columns 'Variable', 'Statistical Measure', group columns specified in `groups`,
+        'Available Samples for Analysis' (total count of samples).
+
+    Notes
+    -----
+    - Assumes `df_grouped` has columns 'Variable', 'Stat' ('mean', 'std', 'count'), and group columns.
+    - Adds rows to `df_sum` with 'mean (SD)' for each variable across groups.
+    - Computes 'Available Samples for Analysis' as the sum of counts across all specified groups.
+
+    """
+    
     num_rows = df_sum.shape[0]
 
     group_1= groups[0]
