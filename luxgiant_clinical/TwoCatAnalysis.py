@@ -7,6 +7,64 @@ import pandas as pd
 
 from scipy import stats
 
+def decide_student_welch(group_1:pd.Series, group_2:pd.Series)->bool:
+
+    """
+    Decide whether to use Welch's t-test or Student's t-test based on Levene's test for equal variances.
+
+    This function performs Levene's test to check the equality of variances between two groups.
+    If the p-value from Levene's test is less than 0.05, it indicates that the variances are unequal,
+    and therefore Welch's t-test should be used. Otherwise, Student's t-test should be used.
+
+    Parameters
+    ----------
+    group_1 : pd.Series
+        The first group of data as a Pandas Series.
+    group_2 : pd.Series
+        The second group of data as a Pandas Series.
+
+    Returns
+    -------
+    bool
+        True if Welch's t-test should be used (unequal variances), False if Student's t-test should be used 
+        (equal variances).
+    """
+
+    # Levene Test's p-value 
+    pval = stats.levene(group_1, group_2, nan_policy='omit').pvalue
+
+    if pval < 0.05: return True # unequal variance => Welch t-test
+    else: return False          # => Student t-test
+
+def ttest_equal_unequal(group_1:pd.Series, group_2:pd.Series)->float:
+
+    """
+    Perform a t-test to compare the means of two groups, using either Welch's t-test or Student's t-test 
+    based on the equality of variances.
+
+    This function first checks whether the variances of the two groups are equal using the 
+    `decide_student_welch` function. It then performs the appropriate t-test:
+    - Welch's t-test if the variances are unequal
+    - Student's t-test if the variances are equal
+
+    Parameters
+    ----------
+    group_1 : pd.Series
+        The first group of data as a Pandas Series.
+    group_2 : pd.Series
+        The second group of data as a Pandas Series.
+
+    Returns
+    -------
+    float
+        The p-value from the t-test indicating the probability of observing the data under the null hypothesis.
+    """
+
+    if decide_student_welch(group_1, group_2):
+        return stats.ttest_ind(group_1.dropna(), group_2.dropna(), equal_var=False).pvalue
+    else:
+        return stats.ttest_ind(group_1.dropna(), group_2.dropna(), equal_var=True).pvalue
+
 def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
     """
