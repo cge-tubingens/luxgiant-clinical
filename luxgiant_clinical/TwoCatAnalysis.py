@@ -526,6 +526,33 @@ def summaryze_count_percent(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variab
 
 def median_iqr_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
 
+    """
+    Calculate median and interquartile range (IQR) for specified features in a DataFrame.
+
+    This function computes the median and IQR (25th to 75th percentile range) for each feature
+    in the input DataFrame (`data`) and returns a summary DataFrame (`result`) with these statistics.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The DataFrame containing the data from which statistics are calculated.
+    features : list
+        A list of column names (features) in `data` for which median and IQR are calculated.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame with columns 'Variable' and 'Total', where 'Variable' lists the feature names
+        from `features` and 'Total' shows the median value followed by the IQR in parentheses.
+
+    Notes
+    -----
+    - NaN values in `data` are ignored when calculating statistics.
+    - Median and IQR are rounded to one decimal place.
+    - Assumes `data` contains numeric data or data that can be quantile-calculated.
+
+    """
+
     result = pd.DataFrame(index=features, columns=['Total'])
 
     for feat in features:
