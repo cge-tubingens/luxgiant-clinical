@@ -571,6 +571,36 @@ def median_iqr_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
 
 def mann_whitney(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
+    """
+    Perform Mann-Whitney U test for each variable between two groups defined by `group_var`.
+
+    This function computes the Mann-Whitney U statistic and p-value for each variable
+    in `variables` between two groups defined by the categorical variable `group_var`
+    in the DataFrame `df_data`.
+
+    Parameters
+    ----------
+    df_data : pd.DataFrame
+        The DataFrame containing the data to be analyzed.
+    variables : list
+        A list of column names (variables) in `df_data` for which Mann-Whitney U test is performed.
+    group_var : str
+        The name of the column in `df_data` that defines the grouping variable.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame summarizing the results of the Mann-Whitney U test for each variable.
+        Columns include 'Variable' (the variable names from `variables`) and 'p-value'
+        (the computed p-value for the test).
+
+    Notes
+    -----
+    - NaN values are automatically dropped before performing the test.
+    - Assumes `df_data` contains numeric data or data that can be compared using the Mann-Whitney U test.
+
+    """
+
     mw_results = {}
 
     groups = df_data[group_var].unique().tolist()
@@ -584,10 +614,6 @@ def mann_whitney(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFr
     results = pd.DataFrame(mw_results).transpose().reset_index().drop(columns='u_stat')
 
     results.columns = ['Variable', 'p-value']
-
-    results['p-value'] = results['p-value'].apply(
-        lambda x: str(round(x,4)) if x > 0.001 else "p<0.001"
-    )
 
     return results
 
