@@ -425,6 +425,31 @@ def chi_squared_tests(df_data:pd.DataFrame, variables:list, group_var:str)->pd.D
 
 def count_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
 
+    """
+    Calculate counts and percentages of non-null values for each feature in the DataFrame.
+
+    This function computes the total count of non-null values, percentage of non-null values,
+    and formats the result for each feature in `features` of the provided DataFrame `data`.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The pandas DataFrame containing the data.
+    features : list
+        A list of column names (features) in `data` for which counts and percentages are computed.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame with columns 'Variable' and 'Total', where 'Variable' contains feature names
+        and 'Total' contains formatted strings of counts and percentages.
+
+    Notes
+    -----
+    The percentage is computed as (count of non-null values / total non-null values) * 100.
+    Null values (NaNs) are ignored in the count and percentage computation.
+    """
+
     result = pd.DataFrame(index=features, columns=['Total'])
 
     for feat in features:
