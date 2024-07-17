@@ -178,6 +178,30 @@ def summaryze_count_percent(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variab
 
 def decide_fisher_chi2(feature_1:pd.Series, feature_2:pd.Series)->bool:
 
+    """
+    Decide whether to use Fisher's exact test or chi-square test based on expected cell counts.
+
+    Parameters
+    ----------
+    feature_1 : pd.Series
+        First categorical feature (variable) for contingency table analysis.
+    feature_2 : pd.Series
+        Second categorical feature (variable) for contingency table analysis.
+
+    Returns
+    -------
+    bool
+        True if Fisher's exact test should be used (expected cell count < 5 in more than 20% of cells), 
+        False if chi-square test can be used.
+
+    Notes
+    -----
+    - Computes a contingency table (`df_cross`) using `pd.crosstab` to count occurrences of feature pairs.
+    - Calculates expected cell counts and determines if more than 20% of expected counts are below 5.
+    - Returns True if Fisher's exact test is recommended, False if chi-square test can be used.
+
+    """
+
     df_cross = pd.crosstab(feature_1, feature_2, margins=True)
 
     counter = []
@@ -195,6 +219,34 @@ def decide_fisher_chi2(feature_1:pd.Series, feature_2:pd.Series)->bool:
     else: return False          # chi2 test can be used
 
 def chi2_fisher_exact(feature_1:pd.Series, feature_2:pd.Series)->float:
+
+    """
+    Perform Fisher's exact test or chi-square test based on expected cell counts and return the p-value.
+
+    Parameters
+    ----------
+    feature_1 : pd.Series
+        First categorical feature (variable) for contingency table analysis.
+    feature_2 : pd.Series
+        Second categorical feature (variable) for contingency table analysis.
+
+    Returns
+    -------
+    float
+        The p-value resulting from Fisher's exact test or chi-square test.
+
+    Notes
+    -----
+    - Computes a contingency table (`crosstab`) using `pd.crosstab` to count occurrences of feature pairs.
+    - Saves the contingency table to a CSV file (`crosstab.csv`) in the current script's directory.
+    - Determines whether to use Fisher's exact test or chi-square test using `decide_fisher_chi2`.
+    - If Fisher's exact test is chosen:
+        - Converts the contingency table to CSV format and runs an R script (`run_r_fisher_test`) to compute the p-value.
+        - Deletes the temporary CSV files (`input_csv` and `output_csv`) after computation.
+    - If chi-square test is chosen:
+        - Uses `stats.chi2_contingency` from scipy.stats to compute the p-value.
+
+    """
 
     crosstab = pd.crosstab(feature_1, feature_2)
 
