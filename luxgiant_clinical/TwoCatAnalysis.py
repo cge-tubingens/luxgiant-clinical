@@ -70,6 +70,10 @@ def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.Dat
     """
     Perform t-tests for multiple variables between two groups in a DataFrame.
 
+    This function computes the p-values for t-tests comparing the means of the specified variables
+    between two groups defined by `group_var`. It automatically decides between Welch's t-test 
+    and Student's t-test based on the equality of variances for each variable.
+
     Parameters
     ----------
     df_data : pd.DataFrame
