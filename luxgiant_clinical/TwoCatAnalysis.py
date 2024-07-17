@@ -188,7 +188,6 @@ def mean_std(data:pd.DataFrame, features:list, grouping_by:str)->pd.DataFrame:
     Raises:
     ------
     KeyError: If any of the features in the features list or the grouping_by column are not present in data.
-
     """
 
     for feat in features:
