@@ -1022,18 +1022,73 @@ class CleanDatscan(BaseEstimator, TransformerMixin):
     
 class CleanPramipexole(BaseEstimator, TransformerMixin):
 
+    """
+    A scikit-learn transformer to clean Pramipexole medication data.
+
+    This transformer modifies the Pramipexole column based on the Ropinirole column in the input DataFrame.
+    """
+
     def __init__(self, pramipex_col:str, ropinerole_col:str) -> None:
+        """
+        Initialize the CleanPramipexole transformer.
+
+        Parameters
+        ----------
+        pramipex_col : str
+            The name of the Pramipexole column to be modified.
+        ropinerole_col : str
+            The name of the Ropinirole column used to determine the modifications.
+        """
         super().__init__()
         self.pramipex_col  = pramipex_col
         self.ropinerole_col= ropinerole_col
 
     def get_feature_names_out(self):
+        """
+        Get output feature names for transformation.
+
+        Returns
+        -------
+        None
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : CleanPramipexole
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+        """
+        Transform the input data by modifying the Pramipexole column based on the Ropinirole column.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            The transformed DataFrame with the Pramipexole column modified.
+        """
 
         X_copy= X.copy()
         pramipex_col  = self.pramipex_col
@@ -1041,23 +1096,77 @@ class CleanPramipexole(BaseEstimator, TransformerMixin):
 
         X_copy.loc[X_copy[ropinerole_col] == 'Yes', pramipex_col] = 'Yes'
 
-
         return X_copy
 
 class HandYcorrector(BaseEstimator, TransformerMixin):
 
+    """
+    A scikit-learn transformer to correct HandY classification based on a reference column.
+
+    This transformer modifies the HandY classification for patients based on the status column and reference column values.
+    """
+
     def __init__(self, status_col:str, ref_col:str='hyonoff') -> None:
+        """
+        Initialize the HandYcorrector transformer.
+
+        Parameters
+        ----------
+        status_col : str
+            The name of the status column used to determine if the subject is a patient.
+        ref_col : str, optional (default='hyonoff')
+            The name of the reference column used to check if the status is 'Off'.
+        """
         super().__init__()
         self.ref_col = ref_col
         self.status_col = status_col
 
     def get_feature_names_out(self):
+        """
+        Get output feature names for transformation.
+
+        Returns
+        -------
+        None
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : HandYcorrector
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
+        """
+        Transform the input data by correcting the HandY classification based on the reference column.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            The transformed DataFrame with the corrected HandY classification.
+        """
 
         X_copy = X.copy()
         cols = X_copy.columns
