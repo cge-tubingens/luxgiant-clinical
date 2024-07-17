@@ -98,7 +98,6 @@ def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.Dat
     if len(groups) != 2:
         raise ValueError("The group_var column must contain exactly two unique values.")
 
-    
     for var in variables:
 
         if var not in df_data.columns or group_var not in df_data.columns:
@@ -107,13 +106,10 @@ def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.Dat
         group1 = df_data[df_data[group_var] == groups[0]][var]
         group2 = df_data[df_data[group_var] == groups[1]][var]
 
-        t_stat, p_val = stats.ttest_ind(group1.dropna(), group2.dropna())
-        ttest_results[var] = {'t_stat': t_stat, 'p_value': p_val}
+        p_val = ttest_equal_unequal(group1, group2)
+        ttest_results[var] = {'p_value': p_val}
 
-    results = pd.DataFrame(ttest_results).transpose().drop(columns='t_stat')
-    results['p_value'] = results['p_value'].apply(
-        lambda x: str(round(x,4)) if x > 0.001 else "p<0.001"
-    )
+    results = pd.DataFrame(ttest_results).transpose()
 
     results = results.reset_index()
     results.columns = ['Variable', 'p-value']
