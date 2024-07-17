@@ -466,9 +466,12 @@ def count_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
 
     return result
 
-def summaryze_count_percent(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, group_1:str, group_2:str)->pd.DataFrame:
+def summaryze_count_percent(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, groups:list)->pd.DataFrame:
 
     num_rows = df_sum.shape[0]
+
+    group_1 = groups[0]
+    group_2 = groups[1]
 
     for k,col in enumerate(variables):
 
@@ -485,7 +488,7 @@ def summaryze_count_percent(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variab
         df_sum.loc[num_rows+k,'Statistical Measure'] = 'n (%)'
         df_sum.loc[num_rows+k,group_1] = f"{round(sum[group_1][0])} ({round(perc[group_1][0],1)})"
         df_sum.loc[num_rows+k,group_2] = f"{round(sum[group_2][0])} ({round(perc[group_2][0],1)})"
-        df_sum.loc[num_rows+k,'Available Sample for Analysis'] = f"{count[group_1][0]+count[group_2][0]}"
+        df_sum.loc[num_rows+k,'Available Samples for Analysis'] = f"{count[group_1][0]+count[group_2][0]}"
 
     return df_sum
 
