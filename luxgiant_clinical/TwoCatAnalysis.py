@@ -669,9 +669,48 @@ def median_iqr(data:pd.DataFrame, features:list, grouping_by:str)->pd.DataFrame:
     
     return grouped
 
-def summaryze_median_iqr(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, group_1:str, group_2:str)->pd.DataFrame:
+def summaryze_median_iqr(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, groups:list)->pd.DataFrame:
 
+    """
+    Summarize median and interquartile range (IQR) for specified variables grouped by two groups.
+
+    This function constructs a summary DataFrame (`df_sum`) from a grouped DataFrame (`df_grouped`)
+    containing statistics such as median, first quartile (Q1), third quartile (Q3), and count
+    for each variable (`variables`) across two groups (`groups`).
+
+    Parameters
+    ----------
+    df_sum : pd.DataFrame
+        The DataFrame to store the summary statistics.
+    df_grouped : pd.DataFrame
+        The DataFrame containing grouped statistics for each variable.
+        Must have columns 'Variable', 'Stat' (with values like 'median', 'first_Q', 'third_Q', 'count'),
+        and columns for each group specified in `groups`.
+    variables : list
+        A list of column names (variables) in `df_grouped` for which statistics are summarized.
+    groups : list
+        A list of two group names in `df_grouped` to compare.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame (`df_sum`) with summarized statistics (median and IQR) for each variable
+        across the two specified groups. Columns include 'Variable' (the variable names),
+        'Statistical Measure' (the type of statistic: 'median (IQR)'), values corresponding
+        to each group defined in `groups`, and 'Available Samples for Analysis' (the total count
+        of samples available for analysis).
+
+    Notes
+    -----
+    - Assumes `df_grouped` has already been grouped and aggregated appropriately.
+    - Requires 'Variable' and 'Stat' columns in `df_grouped` to correctly extract statistics.
+    - Assumes `df_sum` is initialized with the correct structure to append new rows.
+    """
+    
     num_rows = df_sum.shape[0]
+
+    group_1 = groups[0]
+    group_2 = groups[1]
 
     for k,col in enumerate(variables):
 
@@ -690,7 +729,7 @@ def summaryze_median_iqr(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables
         df_sum.loc[num_rows+k,'Statistical Measure'] = 'median (IQR)'
         df_sum.loc[num_rows+k,group_1] = f"{round(medn[group_1][0],1)} ({round(fstq[group_1][0],1)} - {round(trdq[group_1][0],1)})"
         df_sum.loc[num_rows+k,group_2] = f"{round(medn[group_2][0],1)} ({round(fstq[group_2][0],1)} - {round(trdq[group_2][0],1)})"
-        df_sum.loc[num_rows+k,'Available Sample for Analysis'] = f"{count[group_1][0]+count[group_2][0]}"
+        df_sum.loc[num_rows+k,'Available Samples for Analysis'] = f"{count[group_1][0]+count[group_2][0]}"
 
     return df_sum
 
