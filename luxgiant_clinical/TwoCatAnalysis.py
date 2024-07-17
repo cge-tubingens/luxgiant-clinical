@@ -68,28 +68,28 @@ def ttest_equal_unequal(group_1:pd.Series, group_2:pd.Series)->float:
 def t_test_by_group(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
     """
-    Perform independent t-tests for a list of variables between two groups in a DataFrame.
+    Perform t-tests for multiple variables between two groups in a DataFrame.
 
-    Parameters:
-    -----------
-    df_data (pd.DataFrame): 
+    Parameters
+    ----------
+    df_data : pd.DataFrame
         The input DataFrame containing the data.
-    variables (list): 
-        A list of column names (strings) in df_data for which the t-tests will be performed.
-    group_var (str): 
-        The name of the column in df_data that contains the group labels. The column should have exactly two unique values.
+    variables : list
+        A list of variable names (columns) to be tested.
+    group_var : str
+        The name of the column used to define the two groups for comparison.
 
-    Returns:
+    Returns
     -------
-    pd.DataFrame: 
-        A DataFrame with the results of the t-tests. The DataFrame has columns 'Variable' and 'p-value'. 
-        'Variable' contains the names of the variables tested, and 'p-value' contains the p-values of the t-tests. 
-        P-values are rounded to 4 decimal places, with p-values less than 0.001 reported as "p<0.001".
+    pd.DataFrame
+        A DataFrame with the variables and their corresponding p-values from the t-tests.
 
-    Raises:
-    -------
-    ValueError: If the group_var column does not contain exactly two unique values.
-    KeyError: If any of the variables in the variables list or the group_var are not present in df_data.
+    Raises
+    ------
+    ValueError
+        If the `group_var` column does not contain exactly two unique values.
+    KeyError
+        If any of the specified variables or `group_var` is not found in the DataFrame.
     """
 
     ttest_results = {}
