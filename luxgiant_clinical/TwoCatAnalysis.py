@@ -386,22 +386,14 @@ def chi_squared_tests(df_data:pd.DataFrame, variables:list, group_var:str)->pd.D
 
     crosstab_results = {}
     for var in variables:
-        crosstab = pd.crosstab(df_data[var], df_data[group_var])
-        try:
-            chi2, p, dof, ex = stats.chi2_contingency(crosstab)
-        except ValueError:
-            crosstab_results[var] = {'chi2': np.nan, 'p_val': np.nan, 'dof': np.nan}
-        else:
-            crosstab_results[var] = {'chi2': chi2, 'p_val': p, 'dof': dof}
 
-    result = pd.DataFrame(crosstab_results).transpose().drop(columns=['chi2', 'dof'], inplace=False)
+        pval = chi2_fisher_exact(df_data[var], df_data[group_var])
+        crosstab_results[var] = {'p_val': pval}
+
+    result = pd.DataFrame(crosstab_results).transpose()
     result = result.reset_index()
 
     result.columns = ['Variable', 'p-value']
-
-    result['p-value'] = result['p-value'].apply(
-        lambda x: str(round(x,4)) if x > 0.001 else "p<0.001"
-    )
 
     return result
 
