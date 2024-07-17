@@ -1193,22 +1193,80 @@ class HandYcorrector(BaseEstimator, TransformerMixin):
 
 class AgeCategory(BaseEstimator, TransformerMixin):
 
+    """
+    A scikit-learn transformer to categorize age based on onset age and status.
+
+    This transformer adds a new column to the input DataFrame, which contains age categories
+    based on the onset age and status of the subjects.
+    """
+
     def __init__(self, status_col:str, onset_col:str, age_col:str) -> None:
+        """
+        Initialize the AgeCategory transformer.
+
+        Parameters
+        ----------
+        status_col : str
+            The name of the status column indicating if the subject is a 'Control'.
+        onset_col : str
+            The name of the column containing the onset age.
+        age_col : str
+            The name of the column containing the current age.
+        """
         super().__init__()
         self.status_col = status_col
         self.age_col = age_col
         self.onset_col = onset_col
 
     def get_feature_names_out(self):
+        """
+        Get output feature names for transformation.
+
+        Returns
+        -------
+        None
+        """
         pass
 
     def fit(self, X:pd.DataFrame, y=None):
+        """
+        Fit the transformer on the input data.
+
+        This method does nothing and is included to comply with the scikit-learn transformer interface.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to fit.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : AgeCategory
+            Returns self.
+        """
         return self
     
     def transform(self, X:pd.DataFrame, y=None)->pd.DataFrame:
 
+        """
+        Transform the input data by adding a new column with age categories.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            The input data to transform.
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        X_copy : pd.DataFrame
+            The transformed DataFrame with the new column added.
+        """
+
         X_copy = X.copy()
-        col = X_copy.columns[0]
 
         status_col= self.status_col
         age_col   = self.age_col
