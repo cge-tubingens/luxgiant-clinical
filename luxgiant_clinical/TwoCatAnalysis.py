@@ -468,6 +468,38 @@ def count_simple(data:pd.DataFrame, features:list)->pd.DataFrame:
 
 def summaryze_count_percent(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, groups:list)->pd.DataFrame:
 
+    """
+    Summarize count and percentage statistics for variables across two groups.
+
+    This function takes in a summary DataFrame (`df_sum`), a grouped DataFrame (`df_grouped`),
+    a list of variables (`variables`), and a list of group names (`groups`). It computes and
+    formats statistics such as total counts, percentages, and combines them into the summary DataFrame.
+
+    Parameters
+    ----------
+    df_sum : pd.DataFrame
+        The summary DataFrame to which statistics will be added.
+    df_grouped : pd.DataFrame
+        The DataFrame containing grouped statistics, typically generated beforehand.
+    variables : list
+        A list of variable names (columns) for which statistics are summarized.
+    groups : list
+        A list of two group names for which statistics are summarized and compared.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame with columns 'Variable', 'Statistical Measure', names of the two groups from `groups`,
+        and 'Available Samples for Analysis', summarizing count and percentage statistics for each variable.
+
+    Notes
+    -----
+    - Assumes `df_grouped` has columns 'Variable', 'Stat', and statistics for each group in columns corresponding to `groups`.
+    - 'Statistical Measure' column is set to 'n (%)'.
+    - Counts are rounded to integers, and percentages are rounded to one decimal place.
+
+    """
+    
     num_rows = df_sum.shape[0]
 
     group_1 = groups[0]
