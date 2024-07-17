@@ -259,6 +259,28 @@ def summaryze_mean_std(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:l
 
 def count_percent(data:pd.DataFrame, features:list, grouping_by:str)->pd.DataFrame:
 
+    """
+    Compute count and percentage for specified features grouped by a variable in a DataFrame.
+
+    This function calculates the count and percentage of occurrences for each feature within 
+    each group defined by `grouping_by` in the input DataFrame `data`.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The input DataFrame containing the data.
+    features : list
+        A list of column names (features) in `data` for which to compute counts and percentages.
+    grouping_by : str
+        The name of the column in `data` by which to group and compute statistics.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame with columns 'Variable', 'Stat', and percentages ('%') for each feature 
+        within each group defined by `grouping_by`.
+    """
+
     agg_dict = {feat: ['sum', 'count'] for feat in features}
 
     grouped = data.groupby(by=grouping_by, as_index=False)[features]\
