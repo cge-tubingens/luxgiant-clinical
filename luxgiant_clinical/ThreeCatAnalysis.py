@@ -645,6 +645,38 @@ def report_proportion(data_df:pd.DataFrame, variables:list, groups:list, groupin
     
 def bonferroni_mean_std(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str, correc_factor:int)->pd.DataFrame:
 
+    """
+    Perform Bonferroni correction on p-values obtained from mean and standard deviation analysis.
+
+    Parameters
+    ----------
+    data_df : pd.DataFrame
+        DataFrame containing the data.
+    variables : list of str
+        List of column names (variables) in `data_df` to analyze.
+    groups : list of str
+        List of group names to compare.
+    grouping_by : str
+        Column name in `data_df` used for grouping the analysis.
+    correc_factor : int
+        Bonferroni correction factor to adjust p-values.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with adjusted p-values after Bonferroni correction for each variable.
+
+    Notes
+    -----
+    - Uses `two.mean_std` to calculate mean and standard deviation statistics.
+    - Uses `two.summaryze_mean_std` to summarize mean and standard deviation statistics.
+    - Uses `two.mean_std_simple` to obtain simple mean and standard deviation values.
+    - Uses `two.t_test_by_group` to perform t-tests by group for statistical significance.
+    - Resulting DataFrame includes columns 'Variable' and 'Adjusted p-value'.
+    - Adjusts p-values by multiplying the original p-values by the Bonferroni correction factor.
+    - Renames columns for clarity.
+    """
+    
     # create empty dataframe to store results
     summary_cols = ['Variable', 'Statistical Measure'] + groups + ['Available Samples for Analysis']
     df_summary = pd.DataFrame(columns=summary_cols)
@@ -677,6 +709,38 @@ def bonferroni_mean_std(data_df:pd.DataFrame, variables:list, groups:list, group
 
 def bonferroni_median_iqr(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str, correc_factor:int)->pd.DataFrame:
 
+    """
+    Perform Bonferroni correction on p-values obtained from median and IQR analysis.
+
+    Parameters
+    ----------
+    data_df : pd.DataFrame
+        DataFrame containing the data.
+    variables : list of str
+        List of column names (variables) in `data_df` to analyze.
+    groups : list of str
+        List of group names to compare.
+    grouping_by : str
+        Column name in `data_df` used for grouping the analysis.
+    correc_factor : int
+        Bonferroni correction factor to adjust p-values.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with adjusted p-values after Bonferroni correction for each variable.
+
+    Notes
+    -----
+    - Uses `two.median_iqr` to calculate median and interquartile range (IQR) statistics.
+    - Uses `two.summaryze_median_iqr` to summarize median and IQR statistics.
+    - Uses `two.median_iqr_simple` to obtain simple median and IQR values.
+    - Uses `two.mann_whitney` to perform Mann-Whitney U test by group for statistical significance.
+    - Resulting DataFrame includes columns 'Variable' and 'Adjusted p-value'.
+    - Adjusts p-values by multiplying the original p-values by the Bonferroni correction factor.
+    - Renames columns for clarity.
+    """
+    
     # create empty dataframe to store results
     summary_cols = ['Variable', 'Statistical Measure'] + groups + ['Available Samples for Analysis']
     df_summary = pd.DataFrame(columns=summary_cols)
@@ -709,6 +773,42 @@ def bonferroni_median_iqr(data_df:pd.DataFrame, variables:list, groups:list, gro
 
 def bonferroni_proportions(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str, correc_factor:int, subheader:str=None)->pd.DataFrame:
 
+    """
+    Perform Bonferroni correction on p-values obtained from proportion analysis.
+
+    Parameters
+    ----------
+    data_df : pd.DataFrame
+        DataFrame containing the data.
+    variables : list of str
+        List of column names (variables) in `data_df` to analyze.
+    groups : list of str
+        List of group names to compare.
+    grouping_by : str
+        Column name in `data_df` used for grouping the analysis.
+    correc_factor : int
+        Bonferroni correction factor to adjust p-values.
+    subheader : str, optional
+        Optional subheader to prepend to the results DataFrame, default is None.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with adjusted p-values after Bonferroni correction for each variable.
+
+    Notes
+    -----
+    - Uses `two.count_percent` to calculate counts and percentages within each group.
+    - Uses `two.summaryze_count_percent` to summarize counts and percentages.
+    - Uses `two.count_simple` to obtain simple count and percentage values.
+    - Uses `two.chi_squared_tests` to perform Chi-squared tests of independence by group for statistical significance.
+    - Resulting DataFrame includes columns 'Variable' and 'Adjusted p-value'.
+    - Adjusts p-values by multiplying the original p-values by the Bonferroni correction factor.
+    - Renames columns for clarity.
+    - Optionally includes a subheader row at the beginning of the DataFrame if `subheader` is provided.
+
+    """
+    
     # create empty dataframe to store results
     summary_cols = ['Variable', 'Statistical Measure'] + groups + ['Available Samples for Analysis']
     df_summary = pd.DataFrame(columns=summary_cols)
@@ -750,7 +850,58 @@ def bonferroni_proportions(data_df:pd.DataFrame, variables:list, groups:list, gr
     
 def final_formatter(overall_df:pd.DataFrame, adjusted_df:list, groups:list)->pd.DataFrame:
 
+    """
+    Format and merge multiple DataFrames containing statistical results for final presentation.
+
+    Parameters
+    ----------
+    overall_df : pd.DataFrame
+        DataFrame containing overall statistical results.
+    adjusted_df : list of pd.DataFrame
+        List of DataFrames containing adjusted statistical results.
+    groups : list of str
+        List of group names used for statistical comparisons.
+
+    Returns
+    -------
+    pd.DataFrame
+        Formatted DataFrame containing merged statistical results.
+
+    Notes
+    -----
+    - Uses a nested function `pvalue_formatter` to format p-values into readable strings.
+    - Merges `overall_df` with each DataFrame in `adjusted_df` on 'Variable'.
+    - Adds columns from each DataFrame in `adjusted_df` to `overall_df` based on 'Variable'.
+    - Adjusted columns are identified by their column names containing 'p-value' or other statistical measures.
+    - Includes columns 'Variable', 'Statistical Measure', group columns (`groups`), 'Total', 'p-value',
+      and 'Available Samples for Analysis' in the final DataFrame.
+    - Converts p-values in the DataFrame using `pvalue_formatter`.
+    - Fills missing values in the DataFrame with empty strings.
+
+    """
+
     def pvalue_formatter(p_val:float)->str:
+
+        """
+        Format p-values into readable strings.
+
+        Parameters
+        ----------
+        p_val : float
+            p-value to be formatted.
+
+        Returns
+        -------
+        str
+            Formatted string representation of the p-value.
+
+        Notes
+        -----
+        - Returns an empty string if p_val is NaN.
+        - Returns '0.9999' if p_val >= 1.
+        - Returns 'p<0.001' if p_val < 0.001.
+        - Otherwise, returns the p_val rounded to four decimal places as a string.
+        """
 
         from math import isnan
 
