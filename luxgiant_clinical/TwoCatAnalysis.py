@@ -938,7 +938,52 @@ def report_proportion(data_df:pd.DataFrame, variables:list, groups:list, groupin
 
 def final_formatter(data_df:pd.DataFrame, groups:list)->pd.DataFrame:
 
+    """
+    Format the final summary DataFrame containing statistical measures, p-values,
+    total counts or sums, and available samples for analysis.
+
+    This function takes the input DataFrame `data_df` and formats it by ordering columns
+    as 'Variable', 'Statistical Measure', group columns specified in `groups`,
+    'p-value' formatted to display as 'p<0.001', '0.9999', or rounded to four decimal places,
+    'Total' (counts or sums of variables), and 'Available Samples for Analysis' (total count of samples).
+
+    Parameters
+    ----------
+    data_df : pd.DataFrame
+        The DataFrame containing the summary statistics to format.
+    groups : list
+        A list of column names representing the groups compared in the analysis.
+
+    Returns
+    -------
+    pd.DataFrame
+        A formatted DataFrame (`df`) with columns ordered as 'Variable', 'Statistical Measure',
+        group columns defined in `groups`, 'p-value' formatted as described,
+        'Total' (counts or sums of variables), and 'Available Samples for Analysis'
+        (total count of samples). NaN values are filled with empty strings.
+
+    Notes
+    -----
+    - Assumes `data_df` contains columns 'Variable', 'Statistical Measure', 'p-value',
+      'Total', and 'Available Samples for Analysis'.
+    - Uses the helper function `pvalue_formatter` to format the 'p-value' column.
+    """
+
     def pvalue_formatter(p_val:float)->str:
+
+        """
+        Format p-value as 'p<0.001', '0.9999', or rounded to four decimal places.
+
+        Parameters
+        ----------
+        p_val : float
+            The p-value to format.
+
+        Returns
+        -------
+        str
+            Formatted p-value string.
+        """
 
         from math import isnan
 
