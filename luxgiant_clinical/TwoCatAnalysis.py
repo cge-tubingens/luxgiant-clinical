@@ -733,36 +733,156 @@ def summaryze_median_iqr(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables
 
     return df_sum
 
-def count_categories(data:pd.DataFrame, grouping_by:str, variable:str, new_var_name:str=None)->pd.DataFrame:
+def report_mean_std(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str)->pd.DataFrame:
 
-    groups = data[grouping_by].unique().tolist()
+    """
+    Generate a summary report with mean, standard deviation, sample sizes, and t-test results
+    for specified variables across different groups.
 
-    df_0 = data[data[grouping_by]==groups[0]].reset_index(drop=True)
-    df_1 = data[data[grouping_by]==groups[1]].reset_index(drop=True)
+    This function computes descriptive statistics (mean, standard deviation) and performs
+    independent t-tests between groups for each specified variable (`variables`) based on
+    the grouping variable (`grouping_by`). It then combines these results into a summary
+    DataFrame (`df_summary`) for easy comparison.
 
-    count_0 = df_0[variable].value_counts().reset_index()
-    count_0.columns = [variable, groups[0]]
+    Parameters
+    ----------
+    data_df : pd.DataFrame
+        The DataFrame containing the data to analyze.
+    variables : list
+        A list of column names (variables) in `data_df` for which statistics are computed.
+    groups : list
+        A list of column names in `data_df` representing the groups to compare.
+    grouping_by : str
+        The column name in `data_df` used to group the data for comparison.
 
-    count_1 = df_1[variable].value_counts().reset_index()
-    count_1.columns = [variable, groups[1]]
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame (`df_summary`) summarizing mean, standard deviation, p-values from
+        t-tests, and sample sizes for each variable (`variables`) across different groups.
+        Columns include 'Variable' (the variable names), 'Statistical Measure' (type of
+        statistic: 'mean (SD)'), values for each group defined in `groups`, 'Total'
+        (total counts or sums of variables), 'p-value' (p-values from t-tests), and
+        'Available Samples for Analysis' (total count of samples available for analysis).
 
-    result = pd.merge(count_0, count_1, on=variable)
+    Notes
+    -----
+    - Assumes the existence of helper functions `mean_std`, `summaryze_mean_std`,
+      `mean_std_simple`, and `t_test_by_group`.
+    - Assumes `data_df` contains columns specified in `variables`, `groups`, and `grouping_by`.
 
-    result['Total'] = result[groups[0]] + result[groups[1]]
+    """
 
-    result[groups[0]] = result[groups[0]].apply(
-        lambda x: f"{x} ({round(100*x/df_0.shape[0], 1)})"
+    # create empty dataframe to store results
+    summary_cols = ['Variable', 'Statistical Measure'] + groups + ['Available Samples for Analysis']
+    df_summary = pd.DataFrame(columns=summary_cols)
+
+    # descriptive statistics by groups
+    stats_by_group = mean_std(data_df, variables, grouping_by)
+
+    # format table with descriptive statistics
+    df_summary = summaryze_mean_std(
+        df_summary, 
+        stats_by_group, 
+        variables, 
+        groups
     )
+    # merge all results
+    df_summary = df_summary\
+        .merge(
+            mean_std_simple(data_df, variables)
+        )\
+        .merge(
+            t_test_by_group(data_df, variables, grouping_by), on='Variable'
+        )
+    
+    ordered_cols = summary_cols[:-1] + ['Total', 'p-value', 'Available Samples for Analysis']
 
-    result[groups[1]] = result[groups[1]].apply(
-        lambda x: f"{x} ({round(100*x/df_1.shape[0], 1)})"
+    return df_summary[ordered_cols].copy()
+
+def report_median_iqr(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str)->pd.DataFrame:
+
+    # create empty dataframe to store results
+    summary_cols = ['Variable', 'Statistical Measure'] + groups + ['Available Samples for Analysis']
+    df_summary = pd.DataFrame(columns=summary_cols)
+
+    # descriptive statistics by groups
+    stats_by_group = median_iqr(data_df, variables, grouping_by)
+
+    # format table with descriptive statistics
+    df_summary = summaryze_median_iqr(
+        df_summary, 
+        stats_by_group, 
+        variables, 
+        groups
     )
+    # merge all results
+    df_summary = df_summary\
+        .merge(
+            median_iqr_simple(data_df, variables)
+        )\
+        .merge(
+            mann_whitney(data_df, variables, grouping_by), on='Variable'
+        )
+    
+    ordered_cols = summary_cols[:-1] + ['Total', 'p-value', 'Available Samples for Analysis']
 
-    result['Total'] = result['Total'].apply(
-        lambda x: f"{x} ({round(100*x/df_1.shape[0], 1)})"
+    return df_summary[ordered_cols].copy()
+
+def report_proportion(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str, subheader:str=None)->pd.DataFrame:
+
+    # create empty dataframe to store results
+    summary_cols = ['Variable', 'Statistical Measure'] + groups + ['Available Samples for Analysis']
+    df_summary = pd.DataFrame(columns=summary_cols)
+
+    # descriptive statistics by groups
+    stats_by_group = count_percent(data_df, variables, grouping_by)
+
+    # format table with descriptive statistics
+    df_summary = summaryze_count_percent(
+        df_summary, 
+        stats_by_group, 
+        variables, 
+        groups
     )
+    # merge all results
+    df_summary = df_summary\
+        .merge(
+            count_simple(data_df, variables)
+        )\
+        .merge(
+            chi_squared_tests(data_df, variables, grouping_by), on='Variable'
+        )
+    
+    ordered_cols = summary_cols[:-1] + ['Total', 'p-value', 'Available Samples for Analysis']
 
-    if new_var_name is not None:
-        result.columns = [col if col!=variable else new_var_name for col in result.columns]
+    if subheader is not None:
+        values = [subheader] + [np.nan]*(len(ordered_cols)-1)
+        subhead = pd.DataFrame(data=[values], columns=ordered_cols)
 
-    return result
+        df_summary = pd.concat(
+            [subhead, df_summary[ordered_cols].copy()], axis=0, ignore_index=True
+        )
+        return df_summary
+    else: 
+        return df_summary[ordered_cols].copy()
+
+def final_formatter(data_df:pd.DataFrame, groups:list)->pd.DataFrame:
+
+    def pvalue_formatter(p_val:float)->str:
+
+        from math import isnan
+
+        if isnan(p_val): return ''
+        elif p_val>=0.001 and p_val<1: return str(round(p_val,4))
+        elif p_val>=1: return '0.9999'
+        else: return 'p<0.001'
+
+    orderded_cols = ['Variable', 'Statistical Measure'] + groups \
+        +['p-value', 'Total', 'Available Samples for Analysis']
+    
+    df = data_df[orderded_cols].copy()
+
+    df['p-value'] = df['p-value'].apply(lambda x: pvalue_formatter(x))
+
+    return df.fillna('')
