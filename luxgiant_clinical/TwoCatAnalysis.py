@@ -207,9 +207,12 @@ def mean_std(data:pd.DataFrame, features:list, grouping_by:str)->pd.DataFrame:
 
     return grouped
 
-def summaryze_mean_std(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, group_1:str, group_2:str)->pd.DataFrame:
+def summaryze_mean_std(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, groups:list)->pd.DataFrame:
 
     num_rows = df_sum.shape[0]
+
+    group_1 = groups[0]
+    group_2 = groups[1]
 
     for k,col in enumerate(variables):
 
@@ -226,7 +229,7 @@ def summaryze_mean_std(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:l
         df_sum.loc[num_rows+k,'Statistical Measure'] = 'mean (SD)'
         df_sum.loc[num_rows+k,group_1] = f"{round(mean[group_1][0],1)} ({round(std[group_1][0],1)})"
         df_sum.loc[num_rows+k,group_2] = f"{round(mean[group_2][0],1)} ({round(std[group_2][0],1)})"
-        df_sum.loc[num_rows+k,'Available Sample for Analysis'] = f"{count[group_1][0]+count[group_2][0]}"
+        df_sum.loc[num_rows+k,'Available Samples for Analysis'] = f"{count[group_1][0]+count[group_2][0]}"
 
     return df_sum
 
