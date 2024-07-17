@@ -273,6 +273,31 @@ def chi2_fisher_exact(feature_1:pd.Series, feature_2:pd.Series)->float:
     
 def run_r_fisher_test(input_csv, output_csv):
 
+    """
+    Run an R script to perform Fisher's exact test on a contingency table and return the results.
+
+    Parameters
+    ----------
+    input_csv : str
+        Path to the input CSV file containing the contingency table data.
+    output_csv : str
+        Path to the output CSV file where the results of the Fisher's exact test will be saved.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the results of the Fisher's exact test.
+
+    Notes
+    -----
+    - Uses an external R script (`exactFisher.R`) to compute Fisher's exact test.
+    - Reads the contingency table data from `input_csv` and saves the results to `output_csv`.
+    - The R script should take `input_csv` and `output_csv` as command-line arguments.
+    - Uses `subprocess.run` to execute the R script and waits for it to complete.
+    - Reads and returns the results from the `output_csv` file as a pandas DataFrame.
+
+    """
+
     # Get the path to the R script
     script_dir = os.path.dirname(__file__)
     r_script_path = os.path.join(script_dir, "exactFisher.R")
@@ -289,6 +314,33 @@ def run_r_fisher_test(input_csv, output_csv):
 
 def chi_squared_tests(df_data:pd.DataFrame, variables:list, group_var:str)->pd.DataFrame:
 
+    """
+    Perform chi-squared or Fisher's exact tests on contingency tables for each variable.
+
+    Parameters
+    ----------
+    df_data : pd.DataFrame
+        DataFrame containing the data.
+    variables : list
+        List of column names (features) in `df_data` for which tests will be performed.
+    group_var : str
+        Column name in `df_data` representing the grouping variable for contingency tables.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the results of chi-squared or Fisher's exact tests for each variable.
+        Columns include 'Variable' (name of the variable) and 'p-value' (resulting p-value from the test).
+
+    Notes
+    -----
+    - Uses the `chi2_fisher_exact` function to determine whether to perform Fisher's exact test
+      or chi-squared test based on the requirements (using Fisher's exact test if cell counts are low).
+    - Constructs contingency tables for each variable and calculates p-values.
+    - Returns results in a DataFrame format with columns 'Variable' and 'p-value'.
+
+    """
+
     crosstab_results = {}
     for var in variables:
 
@@ -304,6 +356,38 @@ def chi_squared_tests(df_data:pd.DataFrame, variables:list, group_var:str)->pd.D
 
 def summaryze_median_iqr(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, groups:list)->pd.DataFrame:
 
+    """
+    Summarizes median and interquartile range (IQR) statistics for each variable across multiple groups.
+
+    Parameters
+    ----------
+    df_sum : pd.DataFrame
+        DataFrame to store summarized results.
+    df_grouped : pd.DataFrame
+        DataFrame containing grouped statistics.
+    variables : list
+        List of column names (features) in `df_grouped` to summarize.
+    groups : list
+        List of column names in `df_grouped` representing groups for statistical summaries.
+
+    Returns
+    -------
+    pd.DataFrame
+        Updated DataFrame `df_sum` with summarized statistics for each variable across groups.
+        Columns include 'Variable', 'Statistical Measure', groups, and 'Available Samples for Analysis'.
+
+    Notes
+    -----
+    - Constructs summary statistics (median, first quartile, third quartile, count) for each variable
+      across groups specified in `groups`.
+    - Assumes `df_grouped` contains columns 'Variable', 'Stat' (statistics type), and group columns.
+    - Updates `df_sum` with rows corresponding to each variable summarizing median and IQR values
+      for each group.
+    - 'Statistical Measure' is set to 'median (IQR)' for each variable.
+    - 'Available Samples for Analysis' sums the counts across all groups for each variable.
+
+    """
+    
     num_rows = df_sum.shape[0]
 
     group_1 = groups[0]
@@ -333,6 +417,39 @@ def summaryze_median_iqr(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables
     return df_sum
 
 def kruskal_wallis_test(data:pd.DataFrame, grouping:str, test_cols:list)->pd.DataFrame:
+
+    """
+    Perform Kruskal-Wallis test to compare medians of multiple groups for each variable.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        DataFrame containing the data.
+    grouping : str
+        Column name in `data` representing groups for comparison.
+    test_cols : list
+        List of column names (variables) in `data` to test for differences across groups.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with columns 'Variable' and 'p-value' containing results of Kruskal-Wallis test for each variable.
+
+    Raises
+    ------
+    ValueError
+        If the number of unique groups in `data[grouping]` is not equal to 3.
+
+    Notes
+    -----
+    - Kruskal-Wallis test is a non-parametric test to determine if there are differences
+      between the medians of three or more independent groups.
+    - `nan_policy='omit'` is used to handle NaN values by omitting them during the test.
+    - Results DataFrame has rows corresponding to each variable in `test_cols` with columns
+      'Variable' (name of the variable) and 'p-value' (significance level).
+    - Raises an error if the number of unique groups in `data[grouping]` is not exactly 3,
+      as Kruskal-Wallis test requires exactly three groups.
+    """
 
     results = []
     
@@ -463,6 +580,37 @@ def report_median_iqr(data_df:pd.DataFrame, variables:list, groups:list, groupin
 
 def report_proportion(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str, subheader:str=None)->pd.DataFrame:
 
+    """
+    Generate a report summarizing proportions and chi-squared test results for categorical variables.
+
+    Parameters
+    ----------
+    data_df : pd.DataFrame
+        DataFrame containing the data.
+    variables : list
+        List of column names (variables) in `data_df` to analyze.
+    groups : list
+        List of group names to compare (typically two groups).
+    grouping_by : str
+        Column name in `data_df` used for grouping the analysis.
+    subheader : str, optional
+        Subheader to prepend to the report, default is None.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame summarizing proportions, chi-squared test results, and other statistics
+        for each variable across specified groups.
+
+    Notes
+    -----
+    - Uses `two.count_percent` and `two.count_simple` functions to calculate proportions and counts.
+    - Uses `chi_squared_tests` function to perform chi-squared tests for categorical associations.
+    - Resulting DataFrame includes columns 'Variable', 'Statistical Measure', group columns,
+      'Total', 'p-value', and 'Available Samples for Analysis'.
+    - If `subheader` is provided, it prepends a row with this value to the DataFrame.
+    """
+    
     # create empty dataframe to store results
     summary_cols = ['Variable', 'Statistical Measure'] + groups + ['Available Samples for Analysis']
     df_summary = pd.DataFrame(columns=summary_cols)
