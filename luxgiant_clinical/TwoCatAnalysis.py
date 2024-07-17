@@ -209,6 +209,30 @@ def mean_std(data:pd.DataFrame, features:list, grouping_by:str)->pd.DataFrame:
 
 def summaryze_mean_std(df_sum:pd.DataFrame, df_grouped:pd.DataFrame, variables:list, groups:list)->pd.DataFrame:
 
+    """
+    Summarize the mean and standard deviation for specified variables between two groups.
+
+    This function updates `df_sum` with the mean and standard deviation for the specified variables 
+    from `df_grouped`. The summary includes the mean, standard deviation (SD), and the total count 
+    of available samples for analysis for each group.
+
+    Parameters
+    ----------
+    df_sum : pd.DataFrame
+        The DataFrame to update with the summarized statistics.
+    df_grouped : pd.DataFrame
+        The DataFrame containing the grouped statistics, with columns for 'Variable', 'Stat', and the groups.
+    variables : list
+        A list of variable names (columns) to summarize.
+    groups : list
+        A list of two group names to compare.
+
+    Returns
+    -------
+    pd.DataFrame
+        The updated DataFrame `df_sum` with the summarized statistics.
+    """
+
     num_rows = df_sum.shape[0]
 
     group_1 = groups[0]
