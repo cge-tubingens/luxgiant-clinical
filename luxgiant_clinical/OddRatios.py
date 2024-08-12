@@ -7,6 +7,37 @@ import numpy as np
 
 def mcnemar_table(data:pd.DataFrame, df_matched:pd.DataFrame, feature_col:str, id_col:str, marginals:bool=False)->pd.DataFrame:
 
+    """
+    Constructs a contingency table for McNemar's test from matched case-control data.
+
+    This function merges patient and control data, based on the specified feature column, to create 
+    a contingency table used for McNemar's test. The table shows the number of discordant pairs 
+    where the case (patient) and control have differing feature values, which is useful in evaluating 
+    the difference in proportions for paired binary data.
+
+    Parameters:
+    -----------
+    data: pd.DataFrame 
+        The original dataset containing feature information.
+    df_matched: pd.DataFrame 
+        A DataFrame containing matched case-control pairs with columns 'Patient_id' and 'Control_id'.
+    feature_col: str 
+        The column name in `data` representing the binary feature of interest.
+    id_col: str 
+        The column name in `data` that identifies unique individuals (e.g., patient ID).
+    marginals: bool (optional) 
+        If True, adds marginal sums (totals) to the contingency table. Defaults to False.
+
+    Returns:
+    --------
+    pd.DataFrame: A 2x2 contingency table with the counts of case-control pairs for the following:
+                - Case_1, Control_1: Both case and control have the feature.
+                - Case_1, Control_0: Case has the feature, control does not.
+                - Case_0, Control_1: Control has the feature, case does not.
+                - Case_0, Control_0: Neither case nor control have the feature.
+                If `marginals` is True, a 'Total' row and column are added with the sums of each row and column.
+    """
+
     # collect information from patients
     df_temp = pd.merge(df_matched, data, left_on='Patient_id', right_on=id_col)
     df_temp  = df_temp.rename(columns={feature_col: f"{feature_col}_ptnt"})
@@ -52,6 +83,31 @@ def mcnemar_table(data:pd.DataFrame, df_matched:pd.DataFrame, feature_col:str, i
 
 def mcnemar_test(paired_cont:pd.DataFrame)-> tuple:
 
+    """
+    Performs McNemar's test on a paired 2x2 contingency table and calculates the odds ratio with its 
+    confidence interval.
+
+    This function computes McNemar's test statistic and p-value from a given 2x2 contingency table that represents
+    paired data (e.g., before and after treatment). Additionally, it calculates the odds ratio and its 95% 
+    confidence interval, which provide insights into the effect size and its precision.
+
+    Parameters:
+    -----------
+    paired_cont: 
+        pd.DataFrame A 2x2 contingency table as a DataFrame, where:
+            - Row 0, Column 1 represents `b` (case has feature, control does not).
+            - Row 1, Column 0 represents `c` (control has feature, case does not).
+
+    Returns:
+    --------
+    tuple: 
+        A tuple containing the following elements:
+            - float: Odds ratio, rounded to two decimal places.
+            - tuple: 95% confidence interval for the odds ratio, rounded to two decimal places.
+            - float: McNemar's test statistic.
+            - float: p-value for McNemar's test.
+    """
+
     from math import log, sqrt, exp
     
     from statsmodels.stats.contingency_tables import mcnemar
@@ -84,6 +140,33 @@ def mcnemar_test(paired_cont:pd.DataFrame)-> tuple:
     return np.round(odds_ratio, 2), conf_int, statistic, p
 
 def report_mcnemar(data:pd.DataFrame, df_matched:pd.DataFrame, variables:list, id_col:str)->pd.DataFrame:
+
+    """
+    Generates a summary report of McNemar's test results for a set of variables.
+
+    This function computes McNemar's test for multiple binary variables from matched case-control data and compiles
+    the results into a summary DataFrame. For each variable, the function calculates the odds ratio, its 95% confidence
+    interval, and the p-value, which are then formatted and reported.
+
+    Parameters:
+    -----------
+    data: pd.DataFrame 
+        The original dataset containing feature information, with one row per individual.
+    df_matched: pd.DataFrame 
+        A DataFrame containing matched case-control pairs, typically with columns 'Patient_id' and 'Control_id'.
+    variables: list 
+        A list of binary feature column names in `data` for which McNemar's test will be performed.
+    id_col: str 
+        The column name in `data` that identifies unique individuals (e.g., patient ID).
+
+    Returns:
+    --------
+    pd.DataFrame: 
+        A DataFrame with the following columns:
+        - "McN OR (95%CI)": The odds ratio and its 95% confidence interval for each variable.
+        - "p-value": The p-value from McNemar's test, with "<0.001" notation if the p-value is extremely small.
+        The index of the DataFrame will be the variable names.
+    """
 
     # create empty dataframe
     report = pd.DataFrame(columns=["McN OR (95%CI)", "p-value"], index=variables)
