@@ -56,28 +56,32 @@ def mcnemar_test(paired_cont:pd.DataFrame)-> tuple:
     
     from statsmodels.stats.contingency_tables import mcnemar
 
+    # determine elements off the main diagonal
     b = paired_cont.iloc[0,1]
     c = paired_cont.iloc[1,0]
 
+    # add small correction if some of the values is 0
     if b==0 or c==0:
         b+=0.5
         c+=0.5
 
+    # compute McNemar test
     mcnemar_res = mcnemar(paired_cont.to_numpy(), exact=True, correction=False)
 
     statistic = mcnemar_res.statistic
     p = mcnemar_res.pvalue
 
+    # compute odds ratio and its logarithm
     odds_ratio = b/c
-
     log_odds = log(odds_ratio)
 
+    # compute confidence interval
     se_odds = sqrt(1/b+1/c)
     log_conf_int= (log_odds - 1.96*se_odds, log_odds + 1.96*se_odds)
 
-    conf_int = (np.round(exp(log_conf_int[0]),3), np.round(exp(log_conf_int[1]), 3))
+    conf_int = (np.round(exp(log_conf_int[0]),2), np.round(exp(log_conf_int[1]), 2))
 
-    return np.round(odds_ratio, 3), conf_int, statistic, p
+    return np.round(odds_ratio, 2), conf_int, statistic, p
 
 def report_mcnemar(data:pd.DataFrame, df_matched:pd.DataFrame, variables:list, id_col:str)->pd.DataFrame:
 
