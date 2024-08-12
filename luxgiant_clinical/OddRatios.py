@@ -191,4 +191,53 @@ def report_mcnemar(data:pd.DataFrame, df_matched:pd.DataFrame, variables:list, i
         else:
             report.loc[var, "p-value"] = f"{np.round(pval,3)}"
 
+    report = report.reset_index()
+    report.columns = ['Variables', 'McN OR (95% CI)', 'p-value']
+
     return report
+
+def adjusted_odds_ratios(data:pd.DataFrame, target:str, target_code:dict, variables:list, match_1:str, match_2:str)->pd.DataFrame:
+
+    from statsmodels.discrete.conditional_models import ConditionalLogit
+
+    def pval_format(pval:float)->str:
+
+        if pval<0.001: return 'p<0.001'
+        else: return np.round(pval, 3)
+
+    X_copy = data.copy()
+
+    # recode target variable
+    X_copy[target] = X_copy[target].map(target_code)
+
+    # create matched data identifier
+    X_copy['Group ID'] = X_copy[match_1].astype(str) + '_' + X_copy[match_2].astype(str)
+
+    # drop any sample with missing values
+    X = X_copy.dropna(subset=variables, how='any', ignore_index=True, inplace=False)
+
+    #for var in variables:
+    #    X[var] = X[var].apply(lambda x: int(x))
+
+    # train conditional logistic regression model
+    clogit = ConditionalLogit(endog=X[target], exog=X[variables], groups=X['Group ID'])
+    
+    results = clogit.fit()
+
+    odds = pd.DataFrame(columns=['Adjusted OR', 'Lower', 'Upper', 'p-value'], index=variables)
+
+    odds['Adjusted OR'] = np.round(np.exp(results.params.values), 2)
+    odds['Lower']       = np.round(np.exp(results.conf_int()[0].values), 2)
+    odds['Upper']       = np.round(np.exp(results.conf_int()[1].values), 2)
+    odds['p-value']     = results.pvalues.values
+
+    odds['Adjusted OR (95%) CI'] = odds['Adjusted OR'].astype(str) + ' (' \
+        + odds['Lower'].astype(str) + ', ' + odds['Upper'].astype(str) + ')'
+    
+    odds = odds.drop(columns=['Adjusted OR', 'Lower', 'Upper'], inplace=False)
+    odds['p-value'] = odds['p-value'].apply(lambda x: pval_format(x))
+
+    odds = odds.reset_index()
+    odds.columns = ['Variables', 'Adjusted OR (95% CI)', 'p-value']
+
+    return odds
