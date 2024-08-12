@@ -198,9 +198,53 @@ def report_mcnemar(data:pd.DataFrame, df_matched:pd.DataFrame, variables:list, i
 
 def adjusted_odds_ratios(data:pd.DataFrame, target:str, target_code:dict, variables:list, match_1:str, match_2:str)->pd.DataFrame:
 
+    """
+    Calculates adjusted odds ratios with 95% confidence intervals and p-values using conditional logistic regression.
+
+    This function performs a conditional logistic regression on matched case-control data to estimate the 
+    adjusted odds ratios for a set of predictor variables. The odds ratios are adjusted for the matched pairs 
+    defined by the `match_1` and `match_2` columns. The results are presented in a summary DataFrame with 
+    formatted odds ratios, confidence intervals, and p-values.
+
+    Parameters:
+    -----------
+    data: pd.DataFrame 
+        The dataset containing the target variable, predictor variables, and matching identifiers.
+    target: str
+        The name of the binary target variable that is being predicted (e.g., case/control status).
+    target_code: dict
+        A dictionary to recode the target variable into binary values (e.g., {‘Control’: 0, ‘Case’: 1}).
+    variables: list 
+        A list of predictor variables for which the adjusted odds ratios will be computed.
+    match_1: str 
+        The name of the column containing the first matching identifier (e.g., patient ID).
+    match_2: str 
+        The name of the column containing the second matching identifier (e.g., control ID).
+
+    Returns:
+    --------
+    pd.DataFrame: 
+        A DataFrame containing the following columns:
+            - 'Variables': The names of the predictor variables.
+            - 'Adjusted OR (95% CI)': The adjusted odds ratios with 95% confidence intervals.
+            - 'p-value': The p-values corresponding to each odds ratio, formatted as "p<0.001" if less than 0.001.
+
+    Notes:
+    ------
+        - The function uses the `ConditionalLogit` model from `statsmodels` to perform conditional logistic regression.
+        - The target variable must be binary and is recoded using the provided `target_code` dictionary.
+        - Matched groups are created by concatenating the values of `match_1` and `match_2` into a single group identifier.
+        - Missing values in the predictor variables are dropped before fitting the model.
+        - The results are returned in a DataFrame with formatted odds ratios and p-values.
+    """
+    
     from statsmodels.discrete.conditional_models import ConditionalLogit
 
     def pval_format(pval:float)->str:
+
+        """
+        Function to format the reported p-values.
+        """
 
         if pval<0.001: return 'p<0.001'
         else: return np.round(pval, 3)
