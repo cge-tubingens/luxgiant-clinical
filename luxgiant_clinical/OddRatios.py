@@ -85,20 +85,24 @@ def mcnemar_test(paired_cont:pd.DataFrame)-> tuple:
 
 def report_mcnemar(data:pd.DataFrame, df_matched:pd.DataFrame, variables:list, id_col:str)->pd.DataFrame:
 
+    # create empty dataframe
     report = pd.DataFrame(columns=["McN OR (95%CI)", "p-value"], index=variables)
 
+    # loop to fill the values of the dataframe
     for var in variables:
 
         mcn_table = mcnemar_table(
-            data=data[[id_col, var]], 
-            df_matched=df_matched, 
+            data       =data[[id_col, var]], 
+            df_matched =df_matched, 
             feature_col=var, 
-            id_col=id_col
+            id_col     =id_col
         )
 
         OR, CI, stat, pval = mcnemar_test(mcn_table)
 
         report.loc[var, "McN OR (95%CI)"] = f"{OR} {CI}"
+
+        # format results
         if pval<0.001:
             report.loc[var, "p-value"] = "p<0.001"
         else:
