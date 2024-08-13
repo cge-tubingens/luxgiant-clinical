@@ -9,8 +9,7 @@ def categories_recoder(data_df:pd.DataFrame, features:list, code:dict)->pd.DataF
     Recode categorical variables in a DataFrame based on a provided mapping.
 
     This function applies a specified recoding to a list of categorical features in a DataFrame. 
-    The recoding is done using a dictionary that maps the original categories to new values. The 
-    DataFrame is modified in place and returned with the updated values.
+    The recoding is done using a dictionary that maps the original categories to new values.
 
     Parameters:
     -----------
@@ -27,10 +26,12 @@ def categories_recoder(data_df:pd.DataFrame, features:list, code:dict)->pd.DataF
         The DataFrame with the specified features recoded based on the provided mapping.
     """
 
-    for feat in features:
-        data_df[feat] = data_df[feat].map(code)
+    df_copy = data_df.copy()
 
-    return data_df
+    for feat in features:
+        df_copy[feat] = df_copy[feat].map(code)
+
+    return df_copy
 
 
 def recover_columns_names(columns:list)->list:
