@@ -1,6 +1,37 @@
 
 import argparse
 
+import pandas as pd
+
+def categories_recoder(data_df:pd.DataFrame, features:list, code:dict)->pd.DataFrame:
+
+    """
+    Recode categorical variables in a DataFrame based on a provided mapping.
+
+    This function applies a specified recoding to a list of categorical features in a DataFrame. 
+    The recoding is done using a dictionary that maps the original categories to new values. The 
+    DataFrame is modified in place and returned with the updated values.
+
+    Parameters:
+    -----------
+    data_df: pd.DataFrame 
+        The DataFrame containing the data to be recoded.
+    features: list 
+        A list of column names in `data_df` representing the categorical features to be recoded.
+    code: dict 
+        A dictionary where keys are the original category values and values are the new category codes.
+
+    Returns:
+    --------
+    pd.DataFrame: 
+        The DataFrame with the specified features recoded based on the provided mapping.
+    """
+
+    for feat in features:
+        data_df[feat] = data_df[feat].map(code)
+
+    return data_df
+
 
 def recover_columns_names(columns:list)->list:
 
