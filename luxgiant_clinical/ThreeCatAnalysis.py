@@ -898,36 +898,6 @@ def final_formatter(overall_df:pd.DataFrame, adjusted_df:list, groups:list)->pd.
 
     """
 
-    def pvalue_formatter(p_val:float)->str:
-
-        """
-        Format p-values into readable strings.
-
-        Parameters
-        ----------
-        p_val : float
-            p-value to be formatted.
-
-        Returns
-        -------
-        str
-            Formatted string representation of the p-value.
-
-        Notes
-        -----
-        - Returns an empty string if p_val is NaN.
-        - Returns '0.9999' if p_val >= 1.
-        - Returns 'p<0.001' if p_val < 0.001.
-        - Otherwise, returns the p_val rounded to four decimal places as a string.
-        """
-
-        from math import isnan
-
-        if isnan(p_val): return ''
-        elif p_val>=0.001 and p_val<1: return str(round(p_val,4))
-        elif p_val>=1: return '0.9999'
-        else: return 'p<0.001'
-
     orderded_cols = ['Variable', 'Statistical Measure'] + groups \
         +['Total', 'p-value']
     
@@ -947,3 +917,33 @@ def final_formatter(overall_df:pd.DataFrame, adjusted_df:list, groups:list)->pd.
             df[col] = df[col].apply(lambda x: pvalue_formatter(x))
 
     return df.fillna('')
+
+def pvalue_formatter(p_val:float)->str:
+
+    """
+    Format p-values into readable strings.
+
+    Parameters
+    ----------
+    p_val : float
+        p-value to be formatted.
+
+    Returns
+    -------
+    str
+        Formatted string representation of the p-value.
+
+    Notes
+    -----
+    - Returns an empty string if p_val is NaN.
+    - Returns '0.9999' if p_val >= 1.
+    - Returns 'p<0.001' if p_val < 0.001.
+    - Otherwise, returns the p_val rounded to four decimal places as a string.
+    """
+
+    from math import isnan
+
+    if isnan(p_val): return ''
+    elif p_val>=0.001 and p_val<1: return str(round(p_val,4))
+    elif p_val>=1: return '0.9999'
+    else: return 'p<0.001'
