@@ -468,7 +468,7 @@ def kruskal_wallis_test(data:pd.DataFrame, grouping:str, test_cols:list)->pd.Dat
 
     return results_df
 
-def report_mean_std(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str)->pd.DataFrame:
+def report_mean_std(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str, subheader:str=None)->pd.DataFrame:
 
     """
     Generate a summary report of mean, standard deviation, and hypothesis testing for a list of variables, 
