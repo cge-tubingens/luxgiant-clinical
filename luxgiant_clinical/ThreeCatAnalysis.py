@@ -524,9 +524,18 @@ def report_mean_std(data_df:pd.DataFrame, variables:list, groups:list, grouping_
     
     ordered_cols = summary_cols[:-1] + ['Total', 'p-value', 'Available Samples for Analysis']
 
-    return df_summary[ordered_cols].copy()
+    if subheader is not None:
+        values = [subheader] + [np.nan]*(len(ordered_cols)-1)
+        subhead = pd.DataFrame(data=[values], columns=ordered_cols)
 
-def report_median_iqr(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str)->pd.DataFrame:
+        df_summary = pd.concat(
+            [subhead, df_summary[ordered_cols].copy()], axis=0, ignore_index=True
+        )
+        return df_summary
+    else: 
+        return df_summary[ordered_cols].copy()
+
+def report_median_iqr(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str, subheader:str=None)->pd.DataFrame:
 
     """
     Generate a summary report of median, interquartile range (IQR), and hypothesis testing for a list of variables, 
@@ -576,7 +585,16 @@ def report_median_iqr(data_df:pd.DataFrame, variables:list, groups:list, groupin
 
     ordered_cols = summary_cols[:-1] + ['Total', 'p-value', 'Available Samples for Analysis']
 
-    return df_summary[ordered_cols].copy()
+    if subheader is not None:
+        values = [subheader] + [np.nan]*(len(ordered_cols)-1)
+        subhead = pd.DataFrame(data=[values], columns=ordered_cols)
+
+        df_summary = pd.concat(
+            [subhead, df_summary[ordered_cols].copy()], axis=0, ignore_index=True
+        )
+        return df_summary
+    else: 
+        return df_summary[ordered_cols].copy()
 
 def report_proportion(data_df:pd.DataFrame, variables:list, groups:list, grouping_by:str, subheader:str=None)->pd.DataFrame:
 
